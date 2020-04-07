@@ -10,10 +10,12 @@ from tkinter import ttk
 from pyfs_client import PyFSClient
 
 #TODO:
-# Pause active downloads when exiting
 # Move toolbar into panes
+# Add pause, resume, cancel, delete, and pause, resume and delete all buttons
+# Add entry (text box) for address bar and a go button
 
 #DONE:
+# Pause active downloads when exiting and not autoresume them
 # App not exiting when downloads active (probably done)
 # Multiple downloads progress messup
 # Increase download speed update interval
@@ -75,6 +77,8 @@ class Application:
         self.__mainframe.grid_rowconfigure(1, weight=1)
         self.__mainframe.grid_columnconfigure(0, weight=1)
 
+        if len(self.__dl_updates) > 0: self.__download_progress()
+
         # was bound to <TreeviewSelect>
         self.__filelist.bind('<Double-ButtonPress-1>', self.__filelist_select)
 
@@ -135,11 +139,12 @@ class Application:
 
         else: self.__tasklist.insert('', index, iid=key, text=name)
 
-    def __download_progress(self, data):
+    def __download_progress(self, data={}):
         if self.__tasklist == None:
             self.__dl_updates.append(data)
             return
-        else:
+
+        elif len(self.__dl_updates) > 0:
             databuffer = self.__dl_updates
             self.__dl_updates = []
             for olddata in databuffer: self.__download_progress(olddata)
@@ -211,6 +216,7 @@ class Application:
 
     def __exit(self):
         self.__tk.withdraw()
+        self.__client.getfile_pause()
         self.__client.cleanup()
         self.__tk.destroy()
 
