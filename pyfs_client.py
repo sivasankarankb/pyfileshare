@@ -379,6 +379,14 @@ class PyFSClient(ClientLogic):
     def getfile(self, path, callback=None):
         self.__getfile_pipe.send({'command': 'file', 'path': path})
 
+    def getfile_pause(self, target=None):
+        if target == None: self.__getfile_pipe.send({'command': 'pause'})
+        else: self.__getfile_pipe.send({'command': 'pause', 'target': target})
+
+    def getfile_resume(self, target=None):
+        if target == None: self.__getfile_pipe.send({'command': 'resume'})
+        else: self.__getfile_pipe.send({'command': 'resume', 'target': target})
+
     def cleanup(self):
         self.__getfile_monitor_stop()
 
