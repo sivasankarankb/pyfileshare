@@ -68,7 +68,7 @@ class Application:
         self.__panes.insert('end', self.__tasksframe)
 
         self.__filelist_back_button = ttk.Button(
-            master=self.__filesframe, text='<-', command=self.__filelist_back
+            master=self.__filesframe, text='Back', command=self.__filelist_back
         )
 
         self.__filelist_back_button.grid(row=0, column=0, sticky=tk.W)
@@ -123,6 +123,7 @@ class Application:
         # was bound to <TreeviewSelect>
         self.__filelist.bind('<Double-ButtonPress-1>', self.__filelist_select)
 
+        self.__tasklist_current_selection = None
         self.__tasklist.bind('<<TreeviewSelect>>', self.__tasklist_select)
 
         listing = self.__client.list()
@@ -187,19 +188,29 @@ class Application:
             self.__client.getfile_resume(self.__tasklist_current_selection)
 
     def __update_task(self, key, name, values=None):
-        index = 'end'
 
         if self.__tasklist.exists(key):
-            index = self.__tasklist.index(key)
-            self.__tasklist.delete(key)
+            if values != None: self.__tasklist.item(
+                key, text=name, values=values
+            )
 
-        if values != None: self.__tasklist.insert(
-            '', index, iid=key, text=name, values=values
-        )
+            else: self.__tasklist.insert(key, text=name, values=())
 
-        else: self.__tasklist.insert('', index, iid=key, text=name)
+        else:
+
+            if values != None: self.__tasklist.insert(
+                '', 'end', iid=key, text=name, values=values
+            )
+
+            else: self.__tasklist.insert('', 'end', iid=key, text=name)
 
     def __download_progress_pre(self, data): self.__dl_updates.append(data)
+
+    def __download_progress_percent(self, data):
+        numerator = data['partdone'] + 1
+        denominator = data['partmax'] + 1
+        percent = math.floor(100 * numerator/ denominator)
+        return str(percent) + '%'
 
     def __download_progress(self, data):
         if 'status' not in data: return
@@ -214,7 +225,7 @@ class Application:
         elif 'name' in data:
             self.__dl_tasks[path] = {
                 'name': data['name'], 'lastupdated': time.monotonic(),
-                'timestaken': []
+                'timestaken': [], 'done': False, 'paused': False
             }
 
             tname = data['name']
@@ -224,25 +235,29 @@ class Application:
         if status == 'filestarted':
             self.__update_task(path, tname, ('Started'))
 
-        elif status == 'fileerror': self.__update_task(path, tname, ('Failed'))
+        elif status == 'fileerror':
+            self.__update_task(path, tname, ('Failed'))
+            self.__dl_tasks[path]['done'] = True
 
-        elif status == 'filedone': self.__update_task(path, tname, ('Done'))
+        elif status == 'filedone':
+            self.__update_task(path, tname, ('Done'))
+            self.__dl_tasks[path]['done'] = True
 
         elif status == 'filepaused':
-            self.__update_task(path, tname, ('Paused'))
+            percent = self.__download_progress_percent(data)
+            self.__update_task(path, tname, (percent, 'Paused'))
+            self.__dl_tasks[path]['paused'] = True
 
         elif status == 'fileresumed':
-            self.__update_task(path, tname, ('Resumed'))
+            percent = self.__download_progress_percent(data)
+            self.__update_task(path, tname, (percent, 'Resumed'))
+            self.__dl_tasks[path]['paused'] = False
 
         elif status == 'fileprogress':
             self.__dl_tasks[path]['timestaken'].append(data['timetaken'])
 
             if time.monotonic() - self.__dl_tasks[path]['lastupdated'] < 0.1:
                 return
-
-            numerator = data['partdone'] + 1
-            denominator = data['partmax'] + 1
-            percent = math.floor(100 * numerator/ denominator)
 
             timetakenavg = statistics.mean(self.__dl_tasks[path]['timestaken'])
             rate = data['partsize'] / timetakenavg
@@ -261,7 +276,7 @@ class Application:
                 rateunit = 'GB'
 
             rate = str(round(rate, 2)) + rateunit +'/s'
-            percent = str(percent) + '%'
+            percent = self.__download_progress_percent(data)
 
             self.__update_task(path, tname, (percent, rate))
             self.__dl_tasks[path]['lastupdated'] = time.monotonic()
