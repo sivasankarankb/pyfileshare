@@ -12,12 +12,12 @@ from pyfs_client import PyFSClient
 #TODO:
 # Pause active downloads when exiting
 # Move toolbar into panes
-# KeyError in resume status receive - Add __dl_tasks entry on app restart
 
 #DONE:
 # App not exiting when downloads active (probably done)
 # Multiple downloads progress messup
 # Increase download speed update interval
+# KeyError in resume status receive - Add __dl_tasks entry on app restart
 
 class Application:
     def __create_treeview(self, master, columns):
@@ -152,14 +152,19 @@ class Application:
         else: path = ''
 
         if path in self.__dl_tasks: tname = self.__dl_tasks[path]['name']
-        else: tname = path
 
-        if status == 'filestarted':
+        elif 'name' in data:
             self.__dl_tasks[path] = {
                 'name': data['name'], 'lastupdated': time.monotonic(),
                 'timestaken': []
             }
-            self.__update_task(path, data['name'], ('Started'))
+
+            tname = data['name']
+
+        else: tname = path
+
+        if status == 'filestarted':
+            self.__update_task(path, tname, ('Started'))
 
         elif status == 'fileerror': self.__update_task(path, tname, ('Failed'))
 

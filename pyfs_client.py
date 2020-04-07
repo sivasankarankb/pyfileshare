@@ -140,6 +140,7 @@ class DownloadManager(ClientLogic):
 
                     pipe.send({
                         'status': status,
+                        'name': task['listing']['info']['name'],
                         'path': task['listing']['info']['path'],
                         'partdone': partdone, 'partmax': task['maxparts']
                     })
