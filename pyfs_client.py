@@ -19,6 +19,7 @@
 
 #DONE:
 # Progress and speed monitoring on download tasks
+# App not exiting when downloads active
 
 import math
 import io
@@ -317,13 +318,14 @@ class PyFSClient(ClientLogic):
             try:
                 self.__getfile_pipe_lock.acquire()
 
-                if self.__getfile_pipe.poll(0.1):
+                if self.__getfile_pipe.poll():
                     data = self.__getfile_pipe.recv()
                 else: data = None
 
                 self.__getfile_pipe_lock.release()
 
                 if data == None: time.sleep(0.1) # Go idle
+                else: time.sleep(0.02)
 
             except:
                 self.__getfile_pipe_lock.release()
