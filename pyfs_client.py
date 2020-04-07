@@ -314,18 +314,20 @@ class PyFSClient(ClientLogic):
         self.__getfile_monitor_thread_stop = False
 
         while not self.__getfile_monitor_thread_stop:
-            self.__getfile_pipe_lock.acquire()
-
             try:
-                if self.__getfile_pipe.poll(1):
+                self.__getfile_pipe_lock.acquire()
+
+                if self.__getfile_pipe.poll(0.1):
                     data = self.__getfile_pipe.recv()
                 else: data = None
+
+                self.__getfile_pipe_lock.release()
+
+                if data == None: time.sleep(0.1) # Go idle
 
             except:
                 self.__getfile_pipe_lock.release()
                 break
-
-            self.__getfile_pipe_lock.release()
 
             if data != None and type(data) == type({}):
                 callback = self.__getfile_monitor_callback
