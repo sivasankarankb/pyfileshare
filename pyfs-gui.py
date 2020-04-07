@@ -10,8 +10,8 @@ from tkinter import ttk
 from pyfs_client import PyFSClient
 
 #TODO:
-# App not exiting when downloads active
 # Add pause, resume, cancel, delete, and pause, resume and delete all buttons
+# Add scrollbars to file and task lists
 # Add entry (text box) for address bar and a go button
 # Query and display file size, created and modified dates
 
@@ -81,33 +81,49 @@ class Application:
         self.__filesframe.grid_rowconfigure(1, weight=1)
         self.__filesframe.grid_columnconfigure(0, weight=1)
 
-        self.__tasklist_pause_button = ttk.Button(
-            master=self.__tasksframe, text='||',
+        self.__tasklist_pauseall_button = ttk.Button(
+            master=self.__tasksframe, text='Pause All',
             command=self.__client.getfile_pause
         )
 
-        self.__tasklist_pause_button.grid(row=0, column=0, sticky=tk.W)
+        self.__tasklist_pauseall_button.grid(row=0, column=0, sticky=tk.W)
 
-        self.__tasklist_resume_button = ttk.Button(
-            master=self.__tasksframe, text='|>',
+        self.__tasklist_resumeall_button = ttk.Button(
+            master=self.__tasksframe, text='Resume All',
             command=self.__client.getfile_resume
         )
 
-        self.__tasklist_resume_button.grid(row=0, column=1, sticky=tk.W)
+        self.__tasklist_resumeall_button.grid(row=0, column=1, sticky=tk.W)
+
+        self.__tasklist_pauseone_button = ttk.Button(
+            master=self.__tasksframe, text='Pause',
+            command=self.__tasklist_pauseone_click
+        )
+
+        self.__tasklist_pauseone_button.grid(row=0, column=2, sticky=tk.W)
+
+        self.__tasklist_resumeone_button = ttk.Button(
+            master=self.__tasksframe, text='Resume',
+            command=self.__tasklist_resumeone_click
+        )
+
+        self.__tasklist_resumeone_button.grid(row=0, column=3, sticky=tk.W)
 
         self.__tasklist = self.__create_treeview(
             self.__tasksframe, ('Name', 'Progress', 'Speed')
         )
 
-        self.__tasklist.grid(row=1, column=0, columnspan=2, sticky=tk.NSEW)
+        self.__tasklist.grid(row=1, column=0, columnspan=4, sticky=tk.NSEW)
         self.__tasksframe.grid_rowconfigure(1, weight=1)
-        self.__tasksframe.grid_columnconfigure(1, weight=1)
+        self.__tasksframe.grid_columnconfigure(3, weight=1)
 
         self.__client.getfile_monitor_silence(self.__download_progress)
         for update in self.__dl_updates: self.__download_progress(update)
 
         # was bound to <TreeviewSelect>
         self.__filelist.bind('<Double-ButtonPress-1>', self.__filelist_select)
+
+        self.__tasklist.bind('<<TreeviewSelect>>', self.__tasklist_select)
 
         listing = self.__client.list()
         self.__listings = [listing]
@@ -152,6 +168,23 @@ class Application:
 
         elif 'files' in info and sel in info['files']:
             self.__client.getfile(path)
+
+    def __tasklist_select(self, event):
+        sel = self.__tasklist.selection()
+
+        if len(sel) == 0: # TODO: Handle deselect
+            self.__tasklist_current_selection = None
+
+        else: # TODO: Handle select (e.g. button enabling)
+            self.__tasklist_current_selection = sel[0]
+
+    def __tasklist_pauseone_click(self):
+        if self.__tasklist_current_selection != None:
+            self.__client.getfile_pause(self.__tasklist_current_selection)
+
+    def __tasklist_resumeone_click(self):
+        if self.__tasklist_current_selection != None:
+            self.__client.getfile_resume(self.__tasklist_current_selection)
 
     def __update_task(self, key, name, values=None):
         index = 'end'
