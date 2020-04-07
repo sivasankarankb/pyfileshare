@@ -213,7 +213,8 @@ class DownloadManager(ClientLogic):
 
                                 pipe.send({
                                     'status': 'file' + data['command'] + 'd',
-                                    'path': path, 'partdone': task['nextpart'],
+                                    'path': task['listing']['info']['path'],
+                                    'partdone': task['nextpart'],
                                     'partmax': task['maxparts']
                                 })
 
@@ -229,7 +230,8 @@ class DownloadManager(ClientLogic):
 
                                 pipe.send({
                                     'status': 'file' + data['command'] + 'd',
-                                    'path': path, 'partdone': task['nextpart'],
+                                    'path': task['listing']['info']['path'],
+                                    'partdone': task['nextpart'],
                                     'partmax': task['maxparts']
                                 })
 
@@ -291,9 +293,12 @@ class DownloadManager(ClientLogic):
             del task['lasttime']
 
         if len(tasks) > 0:
-            progress = shelve.open(self.__progress_storage)
-            progress['getfile_tasks'] = tasks
-            progress.close()
+            try: progress = shelve.open(self.__progress_storage)
+            except: progress = None
+
+            if progress != None:
+                progress['getfile_tasks'] = tasks
+                progress.close()
 
         else: pathlib.Path(self.__progress_storage).unlink(missing_ok=True)
 
@@ -338,10 +343,10 @@ class PyFSClient(ClientLogic):
                             print('Finished downloading', data['path'])
 
                         elif data['status'] == 'filepaused':
-                            pass
+                            print('Paused downloading', data['path'])
 
                         elif data['status'] == 'fileresumed':
-                            pass
+                            print('Resumed downloading', data['path'])
 
                         elif data['status'] == 'fileprogress':
                             print('Downloading', data['path'])
