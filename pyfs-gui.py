@@ -180,12 +180,22 @@ class Application:
             self.__tasklist_current_selection = sel[0]
 
     def __tasklist_pauseone_click(self):
-        if self.__tasklist_current_selection != None:
-            self.__client.getfile_pause(self.__tasklist_current_selection)
+        sel = self.__tasklist_current_selection
+
+        if sel != None and sel in self.__dl_tasks:
+            paused = self.__dl_tasks[sel]['paused']
+            done = self.__dl_tasks[sel]['done']
+
+            if not (paused or done): self.__client.getfile_pause(sel)
 
     def __tasklist_resumeone_click(self):
-        if self.__tasklist_current_selection != None:
-            self.__client.getfile_resume(self.__tasklist_current_selection)
+        sel = self.__tasklist_current_selection
+
+        if sel != None and sel in self.__dl_tasks:
+            resumed = not self.__dl_tasks[sel]['paused']
+            done = self.__dl_tasks[sel]['done']
+
+            if not (resumed or done): self.__client.getfile_resume(sel)
 
     def __update_task(self, key, name, values=None):
 
