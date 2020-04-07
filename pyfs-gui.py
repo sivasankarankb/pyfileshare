@@ -109,13 +109,20 @@ class Application:
 
         self.__tasklist_resumeone_button.grid(row=0, column=3, sticky=tk.W)
 
+        self.__tasklist_clearcomplete_button = ttk.Button(
+            master=self.__tasksframe, text='Clear',
+            command=self.__tasklist_clearcomplete_click
+        )
+
+        self.__tasklist_clearcomplete_button.grid(row=0, column=4, sticky=tk.W)
+
         self.__tasklist = self.__create_treeview(
             self.__tasksframe, ('Name', 'Progress', 'Speed')
         )
 
-        self.__tasklist.grid(row=1, column=0, columnspan=4, sticky=tk.NSEW)
+        self.__tasklist.grid(row=1, column=0, columnspan=5, sticky=tk.NSEW)
         self.__tasksframe.grid_rowconfigure(1, weight=1)
-        self.__tasksframe.grid_columnconfigure(3, weight=1)
+        self.__tasksframe.grid_columnconfigure(4, weight=1)
 
         self.__client.getfile_monitor_silence(self.__download_progress)
         for update in self.__dl_updates: self.__download_progress(update)
@@ -196,6 +203,15 @@ class Application:
             done = self.__dl_tasks[sel]['done']
 
             if not (resumed or done): self.__client.getfile_resume(sel)
+
+    def __tasklist_clearcomplete_click(self):
+        remaining = {}
+
+        for path, task in self.__dl_tasks.items():
+            if task['done']: self.__tasklist.delete(path)
+            else: remaining[path] = task
+
+        self.__dl_tasks = remaining
 
     def __update_task(self, key, name, values=None):
 
