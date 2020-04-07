@@ -202,38 +202,25 @@ class DownloadManager(ClientLogic):
                     if data['command'] == 'pause': paused = True
                     else: paused = False
 
-                    if 'target' not in data:
-                        for task in tasks:
-
-                            if not task['done']:
-                                task['paused'] = paused
-
-                                if not paused:
-                                    task['lasttime'] = time.monotonic()
-
-                                pipe.send({
-                                    'status': 'file' + data['command'] + 'd',
-                                    'path': task['listing']['info']['path'],
-                                    'partdone': task['nextpart'],
-                                    'partmax': task['maxparts']
-                                })
-
-                    else:
-                        for task in tasks:
+                    for task in tasks:
+                        if 'target' in data:
                             path = task['listing']['info']['path']
+                            matches = path == data['target']
 
-                            if not task['done'] and path == data['target']:
-                                task['paused'] = paused
+                        else: matches = True
 
-                                if not paused:
-                                    task['lasttime'] = time.monotonic()
+                        if not (task['done'] or task['paused'] == paused) and matches:
+                            task['paused'] = paused
 
-                                pipe.send({
-                                    'status': 'file' + data['command'] + 'd',
-                                    'path': task['listing']['info']['path'],
-                                    'partdone': task['nextpart'],
-                                    'partmax': task['maxparts']
-                                })
+                            if not paused:
+                                task['lasttime'] = time.monotonic()
+
+                            pipe.send({
+                                'status': 'file' + data['command'] + 'd',
+                                'path': task['listing']['info']['path'],
+                                'partdone': task['nextpart'],
+                                'partmax': task['maxparts']
+                            })
 
             active_task_count = 0
 
@@ -325,10 +312,13 @@ class PyFSClient(ClientLogic):
         self.__getfile_monitor_callback = None
 
         while not self.__getfile_monitor_thread_stop:
-            if self.__getfile_pipe.poll(1) and not self.__getfile_monitor_thread_stop:
-                data = self.__getfile_pipe.recv()
-                callback = self.__getfile_monitor_callback
+            try:
+                if self.__getfile_pipe.poll(1): data = self.__getfile_pipe.recv()
+                else: data = None
+            except: break
 
+            if data != None:
+                callback = self.__getfile_monitor_callback
                 if type(data) == type({}) and callback != None: callback(data)
 
                 else:
@@ -393,10 +383,10 @@ class PyFSClient(ClientLogic):
         else: self.__getfile_pipe.send({'command': 'resume', 'target': target})
 
     def cleanup(self):
-        self.__getfile_monitor_stop()
-
         if self.__getfile_process.is_alive():
             self.__getfile_pipe.send({'command': 'stop'})
+
+        self.__getfile_monitor_stop()
 
         for unused in range(6):
             if self.__getfile_process.is_alive(): time.sleep(0.5)
