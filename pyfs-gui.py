@@ -47,6 +47,7 @@ class Application:
         self.__tk.grid_columnconfigure(0, weight=1)
 
         self.__tk.protocol("WM_DELETE_WINDOW", self.__exit)
+        self.__exit_in_progress = False
 
         self.__mainframe = ttk.Frame(master=self.__tk)
         self.__mainframe.grid(sticky=tk.NSEW)
@@ -234,9 +235,11 @@ class Application:
             self.__dl_tasks[path]['timestaken'] = []
 
     def __exit(self):
-        self.__client.getfile_pause()
-        self.__client.cleanup()
-        self.__tk.destroy()
+        if not self.__exit_in_progress:
+            self.__exit_in_progress = True
+            self.__client.getfile_pause()
+            self.__client.cleanup()
+            self.__tk.destroy()
 
 if __name__ == '__main__':
     app = Application()
