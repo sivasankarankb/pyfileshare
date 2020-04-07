@@ -10,11 +10,11 @@ from tkinter import ttk
 from pyfs_client import PyFSClient
 
 #TODO:
-# Move toolbar into panes
 # Add pause, resume, cancel, delete, and pause, resume and delete all buttons
 # Add entry (text box) for address bar and a go button
 
 #DONE:
+# Move toolbar into panes
 # Pause active downloads when exiting and not autoresume them
 # App not exiting when downloads active (probably done)
 # Multiple downloads progress messup
@@ -43,39 +43,55 @@ class Application:
 
         self.__tk = tk.Tk()
         self.__tk.grid_rowconfigure(0, weight=1)
-        self.__tk.grid_columnconfigure(1, weight=1)
+        self.__tk.grid_columnconfigure(0, weight=1)
 
         self.__tk.protocol("WM_DELETE_WINDOW", self.__exit)
 
         self.__mainframe = ttk.Frame(master=self.__tk)
         self.__mainframe.grid(sticky=tk.NSEW)
 
-        self.__tasklist_hide_button = ttk.Button(
-            master=self.__mainframe, text='<-', command=self.__filelist_back
-        )
-
-        self.__tasklist_hide_button.grid(row=0, column=0, sticky=tk.W)
+        self.__filesframe = ttk.Frame(master=None)
+        self.__tasksframe = ttk.Frame(master=None)
 
         self.__panes = ttk.PanedWindow(
             master=self.__mainframe, orient='horizontal'
         )
 
-        self.__panes.grid(row=1, column=0, columnspan=3, sticky=tk.NSEW)
+        self.__panes.grid(row=0, column=0, sticky=tk.NSEW)
 
-        self.__tasklist = self.__create_treeview(
-            None, ('Name', 'Progress', 'Speed')
+        self.__mainframe.grid_rowconfigure(0, weight=1)
+        self.__mainframe.grid_columnconfigure(0, weight=1)
+
+        self.__panes.insert('end', self.__filesframe)
+        self.__panes.insert('end', self.__tasksframe)
+
+        self.__filelist_back_button = ttk.Button(
+            master=self.__filesframe, text='<-', command=self.__filelist_back
         )
+
+        self.__filelist_back_button.grid(row=0, column=0, sticky=tk.W)
 
         self.__filelist = self.__create_treeview(
-            None, ('Name', 'Size', 'Created', 'Modified')
+            self.__filesframe, ('Name', 'Size', 'Created', 'Modified')
         )
 
-        self.__panes.insert('end', self.__filelist)
-        self.__panes.insert('end', self.__tasklist)
+        self.__filelist.grid(row=1, column=0, sticky=tk.NSEW)
+        self.__filesframe.grid_rowconfigure(1, weight=1)
+        self.__filesframe.grid_columnconfigure(0, weight=1)
 
-        self.__mainframe.grid_rowconfigure(0, weight=0)
-        self.__mainframe.grid_rowconfigure(1, weight=1)
-        self.__mainframe.grid_columnconfigure(0, weight=1)
+        self.__tasklist_pause_button = ttk.Button(
+            master=self.__tasksframe, text='||'
+        )
+
+        self.__tasklist_pause_button.grid(row=0, column=0, sticky=tk.W)
+
+        self.__tasklist = self.__create_treeview(
+            self.__tasksframe, ('Name', 'Progress', 'Speed')
+        )
+
+        self.__tasklist.grid(row=1, column=0, sticky=tk.NSEW)
+        self.__tasksframe.grid_rowconfigure(1, weight=1)
+        self.__tasksframe.grid_columnconfigure(0, weight=1)
 
         self.__client.getfile_monitor_silence(self.__download_progress)
         for update in self.__dl_updates: self.__download_progress(update)
