@@ -10,7 +10,7 @@ from tkinter import ttk
 from pyfs_client import PyFSClient
 
 #TODO:
-# App not exiting when downloads active (probably done)
+# App not exiting when downloads active
 # Add pause, resume, cancel, delete, and pause, resume and delete all buttons
 # Add entry (text box) for address bar and a go button
 # Query and display file size, created and modified dates
@@ -238,5 +238,6 @@ class Application:
         self.__client.cleanup()
         self.__tk.destroy()
 
-app = Application()
-app.start()
+if __name__ == '__main__':
+    app = Application()
+    app.start()
