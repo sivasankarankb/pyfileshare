@@ -298,6 +298,8 @@ class PyFSClient(ClientLogic):
         dm = DownloadManager(addr, progress_storage)
 
         self.__getfile_pipe, childpipe = mp.Pipe()
+        self.__getfile_pipe_lock = threading.Lock()
+
         process = mp.Process(target=dm.getfile_proc_fun, args=(childpipe,))
         process.start()
         self.__getfile_process = process
@@ -312,12 +314,18 @@ class PyFSClient(ClientLogic):
         self.__getfile_monitor_thread_stop = False
 
         while not self.__getfile_monitor_thread_stop:
+            self.__getfile_pipe_lock.acquire()
+
             try:
                 if self.__getfile_pipe.poll(1):
                     data = self.__getfile_pipe.recv()
                 else: data = None
 
-            except: break
+            except:
+                self.__getfile_pipe_lock.release()
+                break
+
+            self.__getfile_pipe_lock.release()
 
             if data != None and type(data) == type({}):
                 callback = self.__getfile_monitor_callback
@@ -375,19 +383,27 @@ class PyFSClient(ClientLogic):
         self.__getfile_monitor_thread.join()
 
     def getfile(self, path, callback=None):
+        self.__getfile_pipe_lock.acquire()
         self.__getfile_pipe.send({'command': 'file', 'path': path})
+        self.__getfile_pipe_lock.release()
 
     def getfile_pause(self, target=None):
+        self.__getfile_pipe_lock.acquire()
         if target == None: self.__getfile_pipe.send({'command': 'pause'})
         else: self.__getfile_pipe.send({'command': 'pause', 'target': target})
+        self.__getfile_pipe_lock.release()
 
     def getfile_resume(self, target=None):
+        self.__getfile_pipe_lock.acquire()
         if target == None: self.__getfile_pipe.send({'command': 'resume'})
         else: self.__getfile_pipe.send({'command': 'resume', 'target': target})
+        self.__getfile_pipe_lock.release()
 
     def cleanup(self):
         if self.__getfile_process.is_alive():
+            self.__getfile_pipe_lock.acquire()
             self.__getfile_pipe.send({'command': 'stop'})
+            self.__getfile_pipe_lock.release()
 
         self.__getfile_monitor_stop()
 
