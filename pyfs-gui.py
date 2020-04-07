@@ -13,6 +13,7 @@ from pyfs_client import PyFSClient
 # App not exiting when downloads active (probably done)
 # Add pause, resume, cancel, delete, and pause, resume and delete all buttons
 # Add entry (text box) for address bar and a go button
+# Query and display file size, created and modified dates
 
 #DONE:
 # Move toolbar into panes
@@ -233,7 +234,6 @@ class Application:
             self.__dl_tasks[path]['timestaken'] = []
 
     def __exit(self):
-        self.__tk.withdraw()
         self.__client.getfile_pause()
         self.__client.cleanup()
         self.__tk.destroy()
