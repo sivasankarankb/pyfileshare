@@ -308,18 +308,21 @@ class PyFSClient(ClientLogic):
         self.__getfile_monitor_thread.start()
 
     def __getfile_monitor(self):
-        getfile_queue = []
         self.__getfile_monitor_callback = None
+        self.__getfile_monitor_thread_stop = False
 
         while not self.__getfile_monitor_thread_stop:
             try:
-                if self.__getfile_pipe.poll(1): data = self.__getfile_pipe.recv()
+                if self.__getfile_pipe.poll(1):
+                    data = self.__getfile_pipe.recv()
                 else: data = None
+
             except: break
 
-            if data != None:
+            if data != None and type(data) == type({}):
                 callback = self.__getfile_monitor_callback
-                if type(data) == type({}) and callback != None: callback(data)
+
+                if callback != None: callback(data)
 
                 else:
                     if 'status' in data:
