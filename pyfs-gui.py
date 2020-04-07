@@ -39,7 +39,7 @@ class Application:
         self.__dl_tasks = {}
 
         self.__client = PyFSClient('http://127.0.0.1:8080', 'progress.shelf')
-        self.__client.getfile_monitor_silence(self.__download_progress)
+        self.__client.getfile_monitor_silence(self.__download_progress_pre)
 
         self.__tk = tk.Tk()
         self.__tk.grid_rowconfigure(0, weight=1)
@@ -77,7 +77,8 @@ class Application:
         self.__mainframe.grid_rowconfigure(1, weight=1)
         self.__mainframe.grid_columnconfigure(0, weight=1)
 
-        if len(self.__dl_updates) > 0: self.__download_progress()
+        self.__client.getfile_monitor_silence(self.__download_progress)
+        for update in self.__dl_updates: self.__download_progress(update)
 
         # was bound to <TreeviewSelect>
         self.__filelist.bind('<Double-ButtonPress-1>', self.__filelist_select)
@@ -139,16 +140,9 @@ class Application:
 
         else: self.__tasklist.insert('', index, iid=key, text=name)
 
-    def __download_progress(self, data={}):
-        if self.__tasklist == None:
-            self.__dl_updates.append(data)
-            return
+    def __download_progress_pre(self, data): self.__dl_updates.append(data)
 
-        elif len(self.__dl_updates) > 0:
-            databuffer = self.__dl_updates
-            self.__dl_updates = []
-            for olddata in databuffer: self.__download_progress(olddata)
-
+    def __download_progress(self, data):
         if 'status' not in data: return
 
         status = data['status']
