@@ -10,13 +10,13 @@ from tkinter import ttk
 from pyfs_client import PyFSClient
 
 #TODO:
+# App not exiting when downloads active (probably done)
 # Add pause, resume, cancel, delete, and pause, resume and delete all buttons
 # Add entry (text box) for address bar and a go button
 
 #DONE:
 # Move toolbar into panes
 # Pause active downloads when exiting and not autoresume them
-# App not exiting when downloads active (probably done)
 # Multiple downloads progress messup
 # Increase download speed update interval
 # KeyError in resume status receive - Add __dl_tasks entry on app restart
@@ -80,18 +80,26 @@ class Application:
         self.__filesframe.grid_columnconfigure(0, weight=1)
 
         self.__tasklist_pause_button = ttk.Button(
-            master=self.__tasksframe, text='||'
+            master=self.__tasksframe, text='||',
+            command=self.__client.getfile_pause
         )
 
         self.__tasklist_pause_button.grid(row=0, column=0, sticky=tk.W)
+
+        self.__tasklist_resume_button = ttk.Button(
+            master=self.__tasksframe, text='|>',
+            command=self.__client.getfile_resume
+        )
+
+        self.__tasklist_resume_button.grid(row=0, column=1, sticky=tk.W)
 
         self.__tasklist = self.__create_treeview(
             self.__tasksframe, ('Name', 'Progress', 'Speed')
         )
 
-        self.__tasklist.grid(row=1, column=0, sticky=tk.NSEW)
+        self.__tasklist.grid(row=1, column=0, columnspan=2, sticky=tk.NSEW)
         self.__tasksframe.grid_rowconfigure(1, weight=1)
-        self.__tasksframe.grid_columnconfigure(0, weight=1)
+        self.__tasksframe.grid_columnconfigure(1, weight=1)
 
         self.__client.getfile_monitor_silence(self.__download_progress)
         for update in self.__dl_updates: self.__download_progress(update)
