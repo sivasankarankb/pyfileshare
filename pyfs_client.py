@@ -230,8 +230,8 @@ class DownloadManager(ClientLogic):
                         path = task['listing']['info']['path']
 
                         if data['target'] == path and not task['done']:
-                            data['file'].close()
-                            dest = data['saveto']
+                            task['file'].close()
+                            dest = task['saveto']
                             pathlib.Path(dest).unlink(missing_ok=True)
 
                             pipe.send({
