@@ -9,14 +9,15 @@ from tkinter import ttk
 
 from pyfs_client import PyFSClient
 
+# Issue: Pausing tasks, disconnecting, reconnecting and resuming tasks
+#        will not check if right server (no server address stored).
+#        Best to concel tasks before disconnecting.
+
+# Issue: There is no retry for failed info queries.
+# Issue: Time string parse errors (ValueErrors)  are not handled at all
+
 #TODO:
-# Fix bug: Swarm of error messages in terminal for invalid address
-
-# Fix bug: Pausing tasks, disconnecting, reconnecting and resuming tasks
-#          will not check if right server (no server address stored).
-#          Best to concel tasks before disconnecting.
-
-# Query and display file size, created and modified dates
+# Add a forward navigation button to file browser (maybe)
 # Add a refresh button to file browser
 # Add icons for action buttons, files and folders
 
@@ -29,6 +30,8 @@ from pyfs_client import PyFSClient
 # Add pause, resume, cancel, and pause, resume and delete all buttons
 # Add scrollbars to file and task lists
 # Add entry (text box) for address bar and a go button
+# Fix bug: Swarm of error messages in terminal for invalid address
+# Query and display file size, created and modified dates
 
 class Application:
     def __create_treeview(self, master, columns):
@@ -250,8 +253,19 @@ class Application:
                 self.__filelist.insert('', 'end', iid=dir, text=dir)
 
         if 'files' in listing['info']:
-            for file in listing['info']['files']:
-                self.__filelist.insert('', 'end', iid=file, text=file)
+            if 'fileinfo' in listing['info']:
+                for file in listing['info']['files']:
+                    if file in listing['info']['fileinfo']:
+                        size = listing['info']['fileinfo'][file]['size']
+                        created = listing['info']['fileinfo'][file]['created']
+                        mod = listing['info']['fileinfo'][file]['modified']
+                        values = (size, created, mod)
+
+                    else: values = ('', '', '')
+
+                    self.__filelist.insert(
+                        '', 'end', iid=file, text=file, values=values
+                    )
 
     def __filelist_go(self):
         address = self.__address_bar_value.get()
@@ -274,6 +288,32 @@ class Application:
             listing = self.__client.list(path)
 
             if listing != None and listing['status'] == 'ok':
+                if 'files' in listing['info']:
+                    listing['info']['fileinfo'] = {}
+
+                    for file in listing['info']['files']:
+                        path = listing['info']['path'] + file
+                        fileinfo = self.__client.list(path)
+                        infmt = '%j%Y%H%M%S%z'
+                        outfmt = '%a %d %b %Y, %I:%M:%S %p'
+
+                        if fileinfo != None and fileinfo['status'] == 'ok':
+                            parsedinfo = {}
+                            size = fileinfo['info']['size']
+                            parsedinfo['size'] = self.__shortensize(size)
+
+                            moment = fileinfo['info']['created']
+                            moment = time.strptime(moment, infmt)
+                            moment = time.strftime(outfmt, moment)
+                            parsedinfo['created'] = moment
+
+                            moment = fileinfo['info']['modified']
+                            moment = time.strptime(moment, infmt)
+                            moment = time.strftime(outfmt, moment)
+                            parsedinfo['modified'] = moment
+
+                            listing['info']['fileinfo'][file] = parsedinfo
+
                 self.__listings.append(listing)
                 self.__display_listing()
 
@@ -390,6 +430,23 @@ class Application:
         percent = math.floor(100 * numerator/ denominator)
         return str(percent) + '%'
 
+    def __shortensize(self, size):
+        unit = 'B'
+
+        if size >= 1024:
+            size /= 1024
+            unit = 'KB'
+
+        if size >= 1024:
+            size /= 1024
+            unit = 'MB'
+
+        if size >= 1024:
+            size /= 1024
+            unit = 'GB'
+
+        return str(round(size, 2)) + ' ' + unit
+
     def __download_progress(self, data):
         if 'status' not in data: return
 
@@ -439,21 +496,7 @@ class Application:
 
             timetakenavg = statistics.mean(self.__dl_tasks[path]['timestaken'])
             rate = data['partsize'] / timetakenavg
-            rateunit = 'B'
-
-            if rate >= 1024:
-                rate /= 1024
-                rateunit = 'KB'
-
-            if rate >= 1024:
-                rate /= 1024
-                rateunit = 'MB'
-
-            if rate >= 1024:
-                rate /= 1024
-                rateunit = 'GB'
-
-            rate = str(round(rate, 2)) + rateunit +'/s'
+            rate = self.__shortensize(rate) +'/s'
             percent = self.__download_progress_percent(data)
 
             self.__update_task(path, tname, (percent, rate))
