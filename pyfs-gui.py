@@ -20,18 +20,9 @@ from pyfs_client import PyFSClient
 # Add a forward navigation button to file browser (maybe)
 # Add a refresh button to file browser
 # Add icons for action buttons, files and folders
-
-#DONE:
-# Pause active downloads when exiting and not autoresume them
-# Multiple downloads progress messup
-# Increase download speed update interval
-# KeyError in resume status receive - Add __dl_tasks entry on app restart
-# Move toolbar into panes
-# Add pause, resume, cancel, and pause, resume and delete all buttons
-# Add scrollbars to file and task lists
-# Add entry (text box) for address bar and a go button
-# Fix bug: Swarm of error messages in terminal for invalid address
-# Query and display file size, created and modified dates
+# Add sorting by file size, dates, (type maybe?), consideration for grouping?
+# Integrate server into UI (maybe, probably)
+# Have server return more info when listing (maybe)
 
 class Application:
     def __create_treeview(self, master, columns):
@@ -61,6 +52,9 @@ class Application:
         self.__tk = tk.Tk()
         self.__tk.grid_rowconfigure(0, weight=1)
         self.__tk.grid_columnconfigure(0, weight=1)
+
+        self.__icon_file = tk.PhotoImage(file='icons/file.png')
+        self.__icon_folder = tk.PhotoImage(file='icons/folder.png')
 
         self.__tk.protocol("WM_DELETE_WINDOW", self.__exit)
         self.__exit_in_progress = False
@@ -250,7 +244,9 @@ class Application:
 
         if 'dirs' in listing['info']:
             for dir in listing['info']['dirs']:
-                self.__filelist.insert('', 'end', iid=dir, text=dir)
+                self.__filelist.insert(
+                    '', 'end', iid=dir, text=dir, image=self.__icon_folder
+                )
 
         if 'files' in listing['info']:
             if 'fileinfo' in listing['info']:
@@ -264,7 +260,8 @@ class Application:
                     else: values = ('', '', '')
 
                     self.__filelist.insert(
-                        '', 'end', iid=file, text=file, values=values
+                        '', 'end', iid=file, text=file, values=values,
+                        image=self.__icon_file
                     )
 
     def __filelist_go(self):
