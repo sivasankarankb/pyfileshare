@@ -42,7 +42,7 @@ class ClientLogic:
         if not self.__server_ok and not bypass: return None
 
         try: request = requests.get(self.__server_addr + path, params = params)
-        except requests.ConnectionError: return None
+        except: return None
 
         if request.status_code != requests.codes.ok: return None
 
@@ -55,7 +55,7 @@ class ClientLogic:
         if not self.__server_ok and not bypass: return None
 
         try: request = requests.get(self.__server_addr + path, params = params)
-        except requests.ConnectionError: return None
+        except: return None
 
         if request.status_code != requests.codes.ok: return None
 
