@@ -10,17 +10,17 @@ from tkinter import ttk
 from pyfs_client import PyFSClient
 
 #TODO:
-# Add pause, resume, cancel, delete, and pause, resume and delete all buttons
-# Add scrollbars to file and task lists
 # Add entry (text box) for address bar and a go button
 # Query and display file size, created and modified dates
 
 #DONE:
-# Move toolbar into panes
 # Pause active downloads when exiting and not autoresume them
 # Multiple downloads progress messup
 # Increase download speed update interval
 # KeyError in resume status receive - Add __dl_tasks entry on app restart
+# Move toolbar into panes
+# Add pause, resume, cancel, and pause, resume and delete all buttons
+# Add scrollbars to file and task lists
 
 class Application:
     def __create_treeview(self, master, columns):
@@ -85,6 +85,18 @@ class Application:
         )
 
         self.__filelist.grid(row=1, column=0, sticky=tk.NSEW, pady=(8, 0))
+
+        self.__filelist_scrollbar = ttk.Scrollbar(
+            self.__filesframe, orient='vertical'
+        )
+
+        self.__filelist_scrollbar.grid(
+            row=1, column=1, sticky=tk.NS, pady=(8, 0), padx=(8, 0)
+        )
+
+        self.__filelist_scrollbar['command'] = self.__filelist.yview
+        self.__filelist['yscrollcommand'] = self.__filelist_scrollbar.set
+
         self.__filesframe.grid_rowconfigure(1, weight=1)
         self.__filesframe.grid_columnconfigure(0, weight=1)
 
@@ -137,6 +149,17 @@ class Application:
         self.__tasklist.grid(
             row=1, column=0, columnspan=6, sticky=tk.NSEW, pady=(8, 0)
         )
+
+        self.__tasklist_scrollbar = ttk.Scrollbar(
+            self.__tasksframe, orient='vertical'
+        )
+
+        self.__tasklist_scrollbar.grid(
+            row=1, column=6, sticky=tk.NS, pady=(8, 0), padx=(8, 0)
+        )
+
+        self.__tasklist_scrollbar['command'] = self.__tasklist.yview
+        self.__tasklist['yscrollcommand'] = self.__tasklist_scrollbar.set
 
         self.__tasksframe.grid_rowconfigure(1, weight=1)
         self.__tasksframe.grid_columnconfigure(0, weight=1)
