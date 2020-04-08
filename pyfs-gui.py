@@ -109,20 +109,27 @@ class Application:
 
         self.__tasklist_resumeone_button.grid(row=0, column=3, sticky=tk.W)
 
+        self.__tasklist_cancelone_button = ttk.Button(
+            master=self.__tasksframe, text='Cancel',
+            command=self.__tasklist_cancelone_click
+        )
+
+        self.__tasklist_cancelone_button.grid(row=0, column=4, sticky=tk.W)
+
         self.__tasklist_clearcomplete_button = ttk.Button(
             master=self.__tasksframe, text='Clear',
             command=self.__tasklist_clearcomplete_click
         )
 
-        self.__tasklist_clearcomplete_button.grid(row=0, column=4, sticky=tk.W)
+        self.__tasklist_clearcomplete_button.grid(row=0, column=5, sticky=tk.W)
 
         self.__tasklist = self.__create_treeview(
             self.__tasksframe, ('Name', 'Progress', 'Speed')
         )
 
-        self.__tasklist.grid(row=1, column=0, columnspan=5, sticky=tk.NSEW)
+        self.__tasklist.grid(row=1, column=0, columnspan=6, sticky=tk.NSEW)
         self.__tasksframe.grid_rowconfigure(1, weight=1)
-        self.__tasksframe.grid_columnconfigure(4, weight=1)
+        self.__tasksframe.grid_columnconfigure(5, weight=1)
 
         self.__client.getfile_monitor_silence(self.__download_progress)
         for update in self.__dl_updates: self.__download_progress(update)
@@ -203,6 +210,13 @@ class Application:
             done = self.__dl_tasks[sel]['done']
 
             if not (resumed or done): self.__client.getfile_resume(sel)
+
+    def __tasklist_cancelone_click(self):
+        sel = self.__tasklist_current_selection
+
+        if sel != None and sel in self.__dl_tasks:
+            if not self.__dl_tasks[sel]['done']:
+                self.__client.getfile_cancel(sel)
 
     def __tasklist_clearcomplete_click(self):
         remaining = {}
@@ -307,6 +321,10 @@ class Application:
             self.__update_task(path, tname, (percent, rate))
             self.__dl_tasks[path]['lastupdated'] = time.monotonic()
             self.__dl_tasks[path]['timestaken'] = []
+
+        elif status == 'filecanceled':
+            self.__update_task(path, tname, ('Cancelled'))
+            self.__dl_tasks[path]['done'] = True
 
     def __exit(self):
         if not self.__exit_in_progress:
