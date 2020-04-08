@@ -34,6 +34,10 @@ class Application:
 
         return treeview
 
+    def __disable_widget(self, widget): widget.state(('disabled',))
+
+    def __enable_widget(self, widget): widget.state(('!disabled',))
+
     def __init__(self):
         self.__tasklist = None
         self.__dl_updates = []
@@ -59,7 +63,9 @@ class Application:
             master=self.__mainframe, orient='horizontal'
         )
 
-        self.__panes.grid(row=0, column=0, sticky=tk.NSEW)
+        self.__panes.grid(
+            row=0, column=0, sticky=tk.NSEW, pady=8, padx=8
+        )
 
         self.__mainframe.grid_rowconfigure(0, weight=1)
         self.__mainframe.grid_columnconfigure(0, weight=1)
@@ -72,12 +78,13 @@ class Application:
         )
 
         self.__filelist_back_button.grid(row=0, column=0, sticky=tk.W)
+        self.__disable_widget(self.__filelist_back_button)
 
         self.__filelist = self.__create_treeview(
             self.__filesframe, ('Name', 'Size', 'Created', 'Modified')
         )
 
-        self.__filelist.grid(row=1, column=0, sticky=tk.NSEW)
+        self.__filelist.grid(row=1, column=0, sticky=tk.NSEW, pady=(8, 0))
         self.__filesframe.grid_rowconfigure(1, weight=1)
         self.__filesframe.grid_columnconfigure(0, weight=1)
 
@@ -86,7 +93,8 @@ class Application:
             command=self.__client.getfile_pause
         )
 
-        self.__tasklist_pauseall_button.grid(row=0, column=0, sticky=tk.W)
+        self.__tasklist_pauseall_button.grid(row=0, column=0, sticky=tk.E)
+        self.__disable_widget(self.__tasklist_pauseall_button)
 
         self.__tasklist_resumeall_button = ttk.Button(
             master=self.__tasksframe, text='Resume All',
@@ -94,6 +102,7 @@ class Application:
         )
 
         self.__tasklist_resumeall_button.grid(row=0, column=1, sticky=tk.W)
+        self.__disable_widget(self.__tasklist_resumeall_button)
 
         self.__tasklist_pauseone_button = ttk.Button(
             master=self.__tasksframe, text='Pause',
@@ -101,6 +110,7 @@ class Application:
         )
 
         self.__tasklist_pauseone_button.grid(row=0, column=2, sticky=tk.W)
+        self.__disable_widget(self.__tasklist_pauseone_button)
 
         self.__tasklist_resumeone_button = ttk.Button(
             master=self.__tasksframe, text='Resume',
@@ -108,6 +118,7 @@ class Application:
         )
 
         self.__tasklist_resumeone_button.grid(row=0, column=3, sticky=tk.W)
+        self.__disable_widget(self.__tasklist_resumeone_button)
 
         self.__tasklist_cancelone_button = ttk.Button(
             master=self.__tasksframe, text='Cancel',
@@ -115,6 +126,7 @@ class Application:
         )
 
         self.__tasklist_cancelone_button.grid(row=0, column=4, sticky=tk.W)
+        self.__disable_widget(self.__tasklist_cancelone_button)
 
         self.__tasklist_clearcomplete_button = ttk.Button(
             master=self.__tasksframe, text='Clear',
@@ -122,13 +134,18 @@ class Application:
         )
 
         self.__tasklist_clearcomplete_button.grid(row=0, column=5, sticky=tk.W)
+        self.__disable_widget(self.__tasklist_clearcomplete_button)
 
         self.__tasklist = self.__create_treeview(
             self.__tasksframe, ('Name', 'Progress', 'Speed')
         )
 
-        self.__tasklist.grid(row=1, column=0, columnspan=6, sticky=tk.NSEW)
+        self.__tasklist.grid(
+            row=1, column=0, columnspan=6, sticky=tk.NSEW, pady=(8, 0)
+        )
+
         self.__tasksframe.grid_rowconfigure(1, weight=1)
+        self.__tasksframe.grid_columnconfigure(0, weight=1)
         self.__tasksframe.grid_columnconfigure(5, weight=1)
 
         self.__client.getfile_monitor_silence(self.__download_progress)
