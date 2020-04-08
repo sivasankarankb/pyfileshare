@@ -94,7 +94,6 @@ class Application:
         )
 
         self.__tasklist_pauseall_button.grid(row=0, column=0, sticky=tk.E)
-        self.__disable_widget(self.__tasklist_pauseall_button)
 
         self.__tasklist_resumeall_button = ttk.Button(
             master=self.__tasksframe, text='Resume All',
@@ -102,7 +101,6 @@ class Application:
         )
 
         self.__tasklist_resumeall_button.grid(row=0, column=1, sticky=tk.W)
-        self.__disable_widget(self.__tasklist_resumeall_button)
 
         self.__tasklist_pauseone_button = ttk.Button(
             master=self.__tasksframe, text='Pause',
@@ -110,7 +108,6 @@ class Application:
         )
 
         self.__tasklist_pauseone_button.grid(row=0, column=2, sticky=tk.W)
-        self.__disable_widget(self.__tasklist_pauseone_button)
 
         self.__tasklist_resumeone_button = ttk.Button(
             master=self.__tasksframe, text='Resume',
@@ -118,7 +115,6 @@ class Application:
         )
 
         self.__tasklist_resumeone_button.grid(row=0, column=3, sticky=tk.W)
-        self.__disable_widget(self.__tasklist_resumeone_button)
 
         self.__tasklist_cancelone_button = ttk.Button(
             master=self.__tasksframe, text='Cancel',
@@ -126,7 +122,6 @@ class Application:
         )
 
         self.__tasklist_cancelone_button.grid(row=0, column=4, sticky=tk.W)
-        self.__disable_widget(self.__tasklist_cancelone_button)
 
         self.__tasklist_clearcomplete_button = ttk.Button(
             master=self.__tasksframe, text='Clear',
@@ -134,7 +129,6 @@ class Application:
         )
 
         self.__tasklist_clearcomplete_button.grid(row=0, column=5, sticky=tk.W)
-        self.__disable_widget(self.__tasklist_clearcomplete_button)
 
         self.__tasklist = self.__create_treeview(
             self.__tasksframe, ('Name', 'Progress', 'Speed')
@@ -149,7 +143,14 @@ class Application:
         self.__tasksframe.grid_columnconfigure(5, weight=1)
 
         self.__client.getfile_monitor_silence(self.__download_progress)
-        for update in self.__dl_updates: self.__download_progress(update)
+
+        if len(self.__dl_updates) > 0:
+            for update in self.__dl_updates: self.__download_progress(update)
+            self.__dl_updates = []
+
+        else:
+            self.__single_task_buttons_update()
+            self.__all_tasks_buttons_update()
 
         # was bound to <TreeviewSelect>
         self.__filelist.bind('<Double-ButtonPress-1>', self.__filelist_select)
@@ -165,8 +166,15 @@ class Application:
         self.__tk.mainloop()
 
     def __display_listing(self):
+        if len(self.__listings) <= 1:
+            self.__disable_widget(self.__filelist_back_button)
+        else:
+            self.__enable_widget(self.__filelist_back_button)
+
         for child in self.__filelist.get_children():
             self.__filelist.delete(child)
+
+        if len(self.__listings) == 0: return
 
         listing = self.__listings[-1]
 
@@ -201,14 +209,51 @@ class Application:
         elif 'files' in info and sel in info['files']:
             self.__client.getfile(path)
 
+    def __single_task_buttons_update(self, task=None):
+        if task != None:
+            if task in self.__dl_tasks:
+                task = self.__dl_tasks[task]
+            else: return
+
+        if task == None or task['done']:
+            self.__disable_widget(self.__tasklist_pauseone_button)
+            self.__disable_widget(self.__tasklist_resumeone_button)
+            self.__disable_widget(self.__tasklist_cancelone_button)
+
+        elif task['paused']:
+            self.__disable_widget(self.__tasklist_pauseone_button)
+            self.__enable_widget(self.__tasklist_resumeone_button)
+            self.__enable_widget(self.__tasklist_cancelone_button)
+
+        else:
+            self.__enable_widget(self.__tasklist_pauseone_button)
+            self.__disable_widget(self.__tasklist_resumeone_button)
+            self.__enable_widget(self.__tasklist_cancelone_button)
+
+    def __all_tasks_buttons_update(self):
+        paused, resumed, done = False, False, False
+
+        for task in self.__dl_tasks:
+            if self.__dl_tasks[task]['done']: done = True
+            elif self.__dl_tasks[task]['paused']: paused = True
+            else: resumed = True
+
+        if paused: self.__enable_widget(self.__tasklist_resumeall_button)
+        else: self.__disable_widget(self.__tasklist_resumeall_button)
+
+        if resumed: self.__enable_widget(self.__tasklist_pauseall_button)
+        else: self.__disable_widget(self.__tasklist_pauseall_button)
+
+        if done: self.__enable_widget(self.__tasklist_clearcomplete_button)
+        else: self.__disable_widget(self.__tasklist_clearcomplete_button)
+
     def __tasklist_select(self, event):
         sel = self.__tasklist.selection()
 
-        if len(sel) == 0: # TODO: Handle deselect
-            self.__tasklist_current_selection = None
+        if len(sel) == 0: self.__tasklist_current_selection = None
+        else: self.__tasklist_current_selection = sel[0]
 
-        else: # TODO: Handle select (e.g. button enabling)
-            self.__tasklist_current_selection = sel[0]
+        self.__single_task_buttons_update(self.__tasklist_current_selection)
 
     def __tasklist_pauseone_click(self):
         sel = self.__tasklist_current_selection
@@ -243,6 +288,7 @@ class Application:
             else: remaining[path] = task
 
         self.__dl_tasks = remaining
+        self.__all_tasks_buttons_update()
 
     def __update_task(self, key, name, values=None):
 
@@ -342,6 +388,11 @@ class Application:
         elif status == 'filecanceled':
             self.__update_task(path, tname, ('Cancelled'))
             self.__dl_tasks[path]['done'] = True
+
+        if self.__tasklist_current_selection == path:
+            self.__single_task_buttons_update(path)
+
+        self.__all_tasks_buttons_update()
 
     def __exit(self):
         if not self.__exit_in_progress:
