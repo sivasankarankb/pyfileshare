@@ -223,6 +223,25 @@ class DownloadManager(ClientLogic):
                                 'partmax': task['maxparts']
                             })
 
+                elif data['command'] == 'cancel' and 'target' in data:
+                    tasksleft = []
+
+                    for task in tasks:
+                        path = task['listing']['info']['path']
+
+                        if data['target'] == path and not task['done']:
+                            data['file'].close()
+                            dest = data['saveto']
+                            pathlib.Path(dest).unlink(missing_ok=True)
+
+                            pipe.send({
+                                'status': 'filecanceled', 'path': path
+                            })
+
+                        else: tasksleft.append(task)
+
+                    tasks = tasksleft
+
             active_task_count = 0
 
             for task in tasks:
@@ -401,6 +420,11 @@ class PyFSClient(ClientLogic):
         self.__getfile_pipe_lock.acquire()
         if target == None: self.__getfile_pipe.send({'command': 'resume'})
         else: self.__getfile_pipe.send({'command': 'resume', 'target': target})
+        self.__getfile_pipe_lock.release()
+
+    def getfile_cancel(self, target):
+        self.__getfile_pipe_lock.acquire()
+        self.__getfile_pipe.send({'command': 'cancel', 'target': target})
         self.__getfile_pipe_lock.release()
 
     def cleanup(self):
