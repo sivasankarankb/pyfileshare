@@ -10,8 +10,15 @@ from tkinter import ttk
 from pyfs_client import PyFSClient
 
 #TODO:
-# Add entry (text box) for address bar and a go button
+# Fix bug: Swarm of error messages in terminal for invalid address
+
+# Fix bug: Pausing tasks, disconnecting, reconnecting and resuming tasks
+#          will not check if right server (no server address stored).
+#          Best to concel tasks before disconnecting.
+
 # Query and display file size, created and modified dates
+# Add a refresh button to file browser
+# Add icons for action buttons, files and folders
 
 #DONE:
 # Pause active downloads when exiting and not autoresume them
@@ -21,6 +28,7 @@ from pyfs_client import PyFSClient
 # Move toolbar into panes
 # Add pause, resume, cancel, and pause, resume and delete all buttons
 # Add scrollbars to file and task lists
+# Add entry (text box) for address bar and a go button
 
 class Application:
     def __create_treeview(self, master, columns):
@@ -39,12 +47,13 @@ class Application:
     def __enable_widget(self, widget): widget.state(('!disabled',))
 
     def __init__(self):
+        self.__client = None
         self.__tasklist = None
+
+        self.__listings = []
         self.__dl_updates = []
         self.__dl_tasks = {}
-
-        self.__client = PyFSClient('http://127.0.0.1:8080', 'progress.shelf')
-        self.__client.getfile_monitor_silence(self.__download_progress_pre)
+        self.__tasklist_current_selection = None
 
         self.__tk = tk.Tk()
         self.__tk.grid_rowconfigure(0, weight=1)
@@ -77,39 +86,57 @@ class Application:
             master=self.__filesframe, text='Back', command=self.__filelist_back
         )
 
-        self.__filelist_back_button.grid(row=0, column=0, sticky=tk.W)
+        self.__filelist_back_button.grid(row=0, column=0, sticky=tk.E)
         self.__disable_widget(self.__filelist_back_button)
+
+        self.__address_bar_value = tk.StringVar()
+
+        self.__filelist_address_bar = ttk.Entry(
+            self.__filesframe, textvariable=self.__address_bar_value
+        )
+
+        self.__filelist_address_bar.grid(
+            row=0, column=1, sticky=tk.EW, padx=(8, 8)
+        )
+
+        self.__filelist_go_button = ttk.Button(
+            master=self.__filesframe, text='Go', command=self.__filelist_go
+        )
+
+        self.__filelist_go_button.grid(row=0, column=2, sticky=tk.W)
 
         self.__filelist = self.__create_treeview(
             self.__filesframe, ('Name', 'Size', 'Created', 'Modified')
         )
 
-        self.__filelist.grid(row=1, column=0, sticky=tk.NSEW, pady=(8, 0))
+        self.__filelist.grid(
+            row=1, column=0, columnspan=3, sticky=tk.NSEW, pady=(8, 0)
+        )
 
         self.__filelist_scrollbar = ttk.Scrollbar(
             self.__filesframe, orient='vertical'
         )
 
         self.__filelist_scrollbar.grid(
-            row=1, column=1, sticky=tk.NS, pady=(8, 0), padx=(8, 0)
+            row=1, column=3, sticky=tk.NS, pady=(8, 0), padx=(8, 0)
         )
 
         self.__filelist_scrollbar['command'] = self.__filelist.yview
         self.__filelist['yscrollcommand'] = self.__filelist_scrollbar.set
 
         self.__filesframe.grid_rowconfigure(1, weight=1)
-        self.__filesframe.grid_columnconfigure(0, weight=1)
+        self.__filesframe.grid_columnconfigure(1, weight=1)
 
         self.__tasklist_pauseall_button = ttk.Button(
             master=self.__tasksframe, text='Pause All',
-            command=self.__client.getfile_pause
+            command=self.__tasklist_pauseall_click
         )
 
         self.__tasklist_pauseall_button.grid(row=0, column=0, sticky=tk.E)
 
         self.__tasklist_resumeall_button = ttk.Button(
             master=self.__tasksframe, text='Resume All',
-            command=self.__client.getfile_resume
+            command=self.__tasklist_resumeall_click
         )
 
         self.__tasklist_resumeall_button.grid(row=0, column=1, sticky=tk.W)
@@ -165,6 +192,36 @@ class Application:
         self.__tasksframe.grid_columnconfigure(0, weight=1)
         self.__tasksframe.grid_columnconfigure(5, weight=1)
 
+        # was bound to <TreeviewSelect>
+        self.__filelist.bind('<Double-ButtonPress-1>', self.__filelist_select)
+
+        self.__tasklist.bind('<<TreeviewSelect>>', self.__tasklist_select)
+
+        self.__single_task_buttons_update()
+        self.__all_tasks_buttons_update()
+
+    def start(self):
+        self.__tk.mainloop()
+
+    def connect_to(self, addr):
+        if self.__client == None:
+            self.__client = PyFSClient(addr, 'progress.shelf')
+            self.__client.getfile_monitor_silence(self.__download_progress_pre)
+
+        listing = self.__client.list()
+
+        if listing == None:
+            if not self.__client.server_ok(): self.__client = None
+            return False
+
+        self.__disable_widget(self.__filelist_address_bar)
+        #self.__disable_widget(self.__filelist_go_button)
+        self.__filelist_go_button['text'] = 'Disconnect'
+        self.__filelist_go_button['command'] = self.__disconnect
+
+        self.__listings = [listing]
+        self.__display_listing()
+
         self.__client.getfile_monitor_silence(self.__download_progress)
 
         if len(self.__dl_updates) > 0:
@@ -174,19 +231,6 @@ class Application:
         else:
             self.__single_task_buttons_update()
             self.__all_tasks_buttons_update()
-
-        # was bound to <TreeviewSelect>
-        self.__filelist.bind('<Double-ButtonPress-1>', self.__filelist_select)
-
-        self.__tasklist_current_selection = None
-        self.__tasklist.bind('<<TreeviewSelect>>', self.__tasklist_select)
-
-        listing = self.__client.list()
-        self.__listings = [listing]
-        self.__display_listing()
-
-    def start(self):
-        self.__tk.mainloop()
 
     def __display_listing(self):
         if len(self.__listings) <= 1:
@@ -208,6 +252,10 @@ class Application:
         if 'files' in listing['info']:
             for file in listing['info']['files']:
                 self.__filelist.insert('', 'end', iid=file, text=file)
+
+    def __filelist_go(self):
+        address = self.__address_bar_value.get()
+        self.connect_to(address)
 
     def __filelist_back(self):
         if len(self.__listings) > 1:
@@ -277,6 +325,10 @@ class Application:
         else: self.__tasklist_current_selection = sel[0]
 
         self.__single_task_buttons_update(self.__tasklist_current_selection)
+
+    def __tasklist_pauseall_click(self): self.__client.getfile_pause()
+
+    def __tasklist_resumeall_click(self): self.__client.getfile_resume()
 
     def __tasklist_pauseone_click(self):
         sel = self.__tasklist_current_selection
@@ -417,11 +469,37 @@ class Application:
 
         self.__all_tasks_buttons_update()
 
+    def __disconnect(self, forquit=False):
+        if self.__client != None:
+            client = self.__client
+            self.__client = None
+
+            client.getfile_pause()
+            client.cleanup()
+
+            self.__tasklist_current_selection = None
+            self.__dl_tasks = []
+            self.__listings = []
+
+            self.__display_listing()
+
+            for child in self.__tasklist.get_children():
+                self.__tasklist.delete(child)
+
+            self.__single_task_buttons_update()
+            self.__all_tasks_buttons_update()
+
+            if not forquit:
+                self.__enable_widget(self.__filelist_address_bar)
+                self.__enable_widget(self.__filelist_go_button)
+
+                self.__filelist_go_button['text'] = 'Go'
+                self.__filelist_go_button['command'] = self.__filelist_go
+
     def __exit(self):
         if not self.__exit_in_progress:
             self.__exit_in_progress = True
-            self.__client.getfile_pause()
-            self.__client.cleanup()
+            self.__disconnect(forquit=True)
             self.__tk.destroy()
 
 if __name__ == '__main__':
