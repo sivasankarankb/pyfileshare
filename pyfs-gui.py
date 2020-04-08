@@ -87,6 +87,7 @@ class Application:
         self.__disable_widget(self.__filelist_back_button)
 
         self.__address_bar_value = tk.StringVar()
+        self.__address_bar_value.set("http://host:8080")
 
         self.__filelist_address_bar = ttk.Entry(
             self.__filesframe, textvariable=self.__address_bar_value
@@ -101,6 +102,8 @@ class Application:
         )
 
         self.__filelist_go_button.grid(row=0, column=2, sticky=tk.W)
+
+        self.__filelist_address_bar.bind('<Return>', self.__address_bar_activate)
 
         self.__filelist = self.__create_treeview(
             self.__filesframe, ('Name', 'Size', 'Created', 'Modified')
@@ -267,6 +270,8 @@ class Application:
     def __filelist_go(self):
         address = self.__address_bar_value.get()
         self.connect_to(address)
+
+    def __address_bar_activate(self, event): self.__filelist_go()
 
     def __filelist_back(self):
         if len(self.__listings) > 1:
