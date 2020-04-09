@@ -615,7 +615,7 @@ class Application:
             self.__update_task(path, tname, ('Started'))
 
         elif status == 'fileerror':
-            self.__update_task(path, tname, ('Failed'))
+            self.__update_task(path, tname, ('Failed', self.__icon_broken))
             self.__dl_tasks[path]['done'] = True
 
         elif status == 'filedone':
