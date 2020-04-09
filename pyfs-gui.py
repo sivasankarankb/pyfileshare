@@ -23,6 +23,8 @@ from pyfs_client import PyFSClient
 # Add sorting by file size, dates, (type maybe?), consideration for grouping?
 # Integrate server into UI (maybe, probably)
 # Have server return more info when listing (maybe)
+# Breadcrumbs or other indication (address/path) of current location
+# Do useful things with the title bar text?
 
 class Application:
     def __create_treeview(self, master, columns):
@@ -40,6 +42,10 @@ class Application:
 
     def __enable_widget(self, widget): widget.state(('!disabled',))
 
+    def __load_icon(self, path):
+        try: return tk.PhotoImage(file=path)
+        except: return None
+
     def __init__(self):
         self.__client = None
         self.__tasklist = None
@@ -53,8 +59,17 @@ class Application:
         self.__tk.grid_rowconfigure(0, weight=1)
         self.__tk.grid_columnconfigure(0, weight=1)
 
-        self.__icon_file = tk.PhotoImage(file='icons/file.png')
-        self.__icon_folder = tk.PhotoImage(file='icons/folder.png')
+        self.__icon_file = self.__load_icon('icons/file.png')
+        self.__icon_folder = self.__load_icon('icons/folder.png')
+
+        self.__icon_pause_all = self.__load_icon('icons/pause_all.png')
+        self.__icon_resume_all = self.__load_icon('icons/resume_all.png')
+
+        self.__icon_pause = self.__load_icon('icons/pause.png')
+        self.__icon_resume = self.__load_icon('icons/resume.png')
+
+        self.__icon_cancel = self.__load_icon('icons/cancel.png')
+        self.__icon_clear = self.__load_icon('icons/clear.png')
 
         self.__tk.protocol("WM_DELETE_WINDOW", self.__exit)
         self.__exit_in_progress = False
@@ -129,45 +144,63 @@ class Application:
 
         self.__tasklist_pauseall_button = ttk.Button(
             master=self.__tasksframe, text='Pause All',
-            command=self.__tasklist_pauseall_click
+            command=self.__tasklist_pauseall_click,
+            image=self.__icon_pause_all,
         )
 
-        self.__tasklist_pauseall_button.grid(row=0, column=0, sticky=tk.E)
+        self.__tasklist_pauseall_button.grid(
+            row=0, column=0, sticky=tk.E, padx=4
+        )
 
         self.__tasklist_resumeall_button = ttk.Button(
             master=self.__tasksframe, text='Resume All',
-            command=self.__tasklist_resumeall_click
+            command=self.__tasklist_resumeall_click,
+            image=self.__icon_resume_all
         )
 
-        self.__tasklist_resumeall_button.grid(row=0, column=1, sticky=tk.W)
+        self.__tasklist_resumeall_button.grid(
+            row=0, column=1, sticky=tk.W, padx=4
+        )
 
         self.__tasklist_pauseone_button = ttk.Button(
             master=self.__tasksframe, text='Pause',
-            command=self.__tasklist_pauseone_click
+            command=self.__tasklist_pauseone_click,
+            image=self.__icon_pause
         )
 
-        self.__tasklist_pauseone_button.grid(row=0, column=2, sticky=tk.W)
+        self.__tasklist_pauseone_button.grid(
+            row=0, column=2, sticky=tk.W, padx=4
+        )
 
         self.__tasklist_resumeone_button = ttk.Button(
             master=self.__tasksframe, text='Resume',
-            command=self.__tasklist_resumeone_click
+            command=self.__tasklist_resumeone_click,
+            image=self.__icon_resume
         )
 
-        self.__tasklist_resumeone_button.grid(row=0, column=3, sticky=tk.W)
+        self.__tasklist_resumeone_button.grid(
+            row=0, column=3, sticky=tk.W, padx=4
+        )
 
         self.__tasklist_cancelone_button = ttk.Button(
             master=self.__tasksframe, text='Cancel',
-            command=self.__tasklist_cancelone_click
+            command=self.__tasklist_cancelone_click,
+            image=self.__icon_cancel
         )
 
-        self.__tasklist_cancelone_button.grid(row=0, column=4, sticky=tk.W)
+        self.__tasklist_cancelone_button.grid(
+            row=0, column=4, sticky=tk.W, padx=4
+        )
 
         self.__tasklist_clearcomplete_button = ttk.Button(
             master=self.__tasksframe, text='Clear',
-            command=self.__tasklist_clearcomplete_click
+            command=self.__tasklist_clearcomplete_click,
+            image=self.__icon_clear
         )
 
-        self.__tasklist_clearcomplete_button.grid(row=0, column=5, sticky=tk.W)
+        self.__tasklist_clearcomplete_button.grid(
+            row=0, column=5, sticky=tk.W, padx=4
+        )
 
         self.__tasklist = self.__create_treeview(
             self.__tasksframe, ('Name', 'Progress', 'Speed')
@@ -447,7 +480,7 @@ class Application:
             size /= 1024
             unit = 'GB'
 
-        return str(round(size, 2)) + ' ' + unit
+        return str('%.2f' % round(size, 2)) + ' ' + unit
 
     def __download_progress(self, data):
         if 'status' not in data: return
