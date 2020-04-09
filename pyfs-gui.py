@@ -51,21 +51,48 @@ class Application:
         self.__tasklist = None
 
         self.__listings = []
+        self.__listings_forward = []
+
         self.__dl_updates = []
         self.__dl_tasks = {}
         self.__tasklist_current_selection = None
+        self.__server_addr = ''
 
         self.__tk = tk.Tk()
+        self.__tk.withdraw()
+
+        screenwidth = self.__tk.winfo_screenwidth()
+        screenheight = self.__tk.winfo_screenheight()
+
+        width = int(0.95 * screenwidth)
+        #height = int(0.8 * screenheight)
+        height = 600
+        winleft = int((screenwidth - width) / 2)
+        wintop = int((screenheight - height) / 2)
+
+        width = str(width)
+        height = str(height)
+        winleft = str(winleft)
+        wintop = str(wintop)
+
+        geometry = '=' + width + 'x' + height + '+' + winleft + '+' + wintop
+        self.__tk.geometry(geometry)
+        self.__tk.deiconify()
+
         self.__tk.grid_rowconfigure(0, weight=1)
         self.__tk.grid_columnconfigure(0, weight=1)
 
         self.__icon_go = self.__load_icon('icons/go.png')
         self.__icon_disconnect = self.__load_icon('icons/disconnect.png')
+
         self.__icon_back = self.__load_icon('icons/backward.png')
+        self.__icon_refresh = self.__load_icon('icons/refresh.png')
+        self.__icon_forward = self.__load_icon('icons/forward.png')
 
         self.__icon_file = self.__load_icon('icons/file.png')
         self.__icon_folder = self.__load_icon('icons/folder.png')
         self.__icon_done = self.__load_icon('icons/done.png')
+        self.__icon_broken = self.__load_icon('icons/broken_file.png')
 
         self.__icon_pause_all = self.__load_icon('icons/pause_all.png')
         self.__icon_resume_all = self.__load_icon('icons/resume_all.png')
@@ -99,6 +126,11 @@ class Application:
         self.__panes.insert('end', self.__filesframe)
         self.__panes.insert('end', self.__tasksframe)
 
+        self.__style = ttk.Style()
+        self.__style.configure('TButton', relief='flat')
+        self.__style.configure('TEntry', relief='flat', padding=4)
+        self.__style.configure('Treeview', rowheight=28)
+
         self.__filelist_back_button = ttk.Button(
             master=self.__filesframe, text='Back',
             command=self.__filelist_back, image=self.__icon_back
@@ -106,6 +138,22 @@ class Application:
 
         self.__filelist_back_button.grid(row=0, column=0, sticky=tk.E)
         self.__disable_widget(self.__filelist_back_button)
+
+        self.__filelist_refresh_button = ttk.Button(
+            master=self.__filesframe, text='Refresh',
+            command=self.__filelist_refresh, image=self.__icon_refresh
+        )
+
+        self.__filelist_refresh_button.grid(row=0, column=1)
+        self.__disable_widget(self.__filelist_refresh_button)
+
+        self.__filelist_forward_button = ttk.Button(
+            master=self.__filesframe, text='Forward',
+            command=self.__filelist_forward, image=self.__icon_forward
+        )
+
+        self.__filelist_forward_button.grid(row=0, column=2, sticky=tk.W)
+        self.__disable_widget(self.__filelist_forward_button)
 
         self.__address_bar_value = tk.StringVar()
         self.__address_bar_value.set("http://host:8080")
@@ -115,7 +163,7 @@ class Application:
         )
 
         self.__filelist_address_bar.grid(
-            row=0, column=1, sticky=tk.EW, padx=(8, 8)
+            row=0, column=3, sticky=tk.EW, padx=8
         )
 
         self.__filelist_go_button = ttk.Button(
@@ -123,7 +171,7 @@ class Application:
             image=self.__icon_go
         )
 
-        self.__filelist_go_button.grid(row=0, column=2, sticky=tk.W)
+        self.__filelist_go_button.grid(row=0, column=4, sticky=tk.W)
 
         self.__filelist_address_bar.bind('<Return>', self.__address_bar_activate)
 
@@ -132,7 +180,7 @@ class Application:
         )
 
         self.__filelist.grid(
-            row=1, column=0, columnspan=3, sticky=tk.NSEW, pady=(8, 0)
+            row=1, column=0, columnspan=5, sticky=tk.NSEW, pady=(8, 0)
         )
 
         self.__filelist_scrollbar = ttk.Scrollbar(
@@ -140,14 +188,14 @@ class Application:
         )
 
         self.__filelist_scrollbar.grid(
-            row=1, column=3, sticky=tk.NS, pady=(8, 0), padx=(8, 0)
+            row=1, column=5, sticky=tk.NS, pady=(8, 0), padx=(8, 0)
         )
 
         self.__filelist_scrollbar['command'] = self.__filelist.yview
         self.__filelist['yscrollcommand'] = self.__filelist_scrollbar.set
 
         self.__filesframe.grid_rowconfigure(1, weight=1)
-        self.__filesframe.grid_columnconfigure(1, weight=1)
+        self.__filesframe.grid_columnconfigure(3, weight=1)
 
         self.__tasklist_pauseall_button = ttk.Button(
             master=self.__tasksframe, text='Pause All',
@@ -239,6 +287,13 @@ class Application:
 
         self.__single_task_buttons_update()
         self.__all_tasks_buttons_update()
+        self.__set_title()
+
+    def __set_title(self, title=''):
+        if title != '': title = 'pyfs - ' + title
+        else: title = 'pyfs'
+
+        self.__tk.title(title)
 
     def start(self):
         self.__tk.mainloop()
@@ -252,11 +307,15 @@ class Application:
 
         if listing == None:
             if not self.__client.server_ok(): self.__client = None
+            self.__server_addr = ''
             return False
 
         self.__filelist_address_bar_state('disconnect')
-
         self.__listings = [listing]
+
+        if not addr.endswith('/'): addr += '/'
+
+        self.__server_addr = addr
         self.__display_listing()
 
         self.__client.getfile_monitor_silence(self.__download_progress)
@@ -269,6 +328,8 @@ class Application:
             self.__single_task_buttons_update()
             self.__all_tasks_buttons_update()
 
+        return True
+
     def __display_listing(self):
         if len(self.__listings) <= 1:
             self.__disable_widget(self.__filelist_back_button)
@@ -278,9 +339,20 @@ class Application:
         for child in self.__filelist.get_children():
             self.__filelist.delete(child)
 
-        if len(self.__listings) == 0: return
+        if len(self.__listings_forward) > 0:
+            self.__enable_widget(self.__filelist_forward_button)
+
+        else: self.__disable_widget(self.__filelist_forward_button)
+
+        if len(self.__listings) == 0:
+            self.__disable_widget(self.__filelist_refresh_button)
+            self.__set_title()
+            return
+
+        self.__enable_widget(self.__filelist_refresh_button)
 
         listing = self.__listings[-1]
+        self.__set_title(self.__server_addr + listing['info']['path'])
 
         if 'dirs' in listing['info']:
             for dir in listing['info']['dirs']:
@@ -325,8 +397,54 @@ class Application:
 
     def __filelist_back(self):
         if len(self.__listings) > 1:
-            self.__listings.pop()
+            self.__listings_forward.append(self.__listings.pop())
+            self.__filelist_refresh()
             self.__display_listing()
+
+    def __filelist_forward(self):
+        if len(self.__listings_forward) > 0:
+            self.__listings.append(self.__listings_forward.pop())
+            self.__filelist_refresh()
+            self.__display_listing()
+
+    def __filelist_refresh(self):
+        if len(self.__listings) == 0: return
+
+        path = self.__listings[-1]['info']['path']
+        listing = self.__client.list(path)
+
+        if listing != None and listing['status'] == 'ok':
+            self.__listing_fetch_details(listing)
+            self.__listings.pop()
+            self.__listings.append(listing)
+            self.__display_listing()
+
+    def __listing_fetch_details(self, listing):
+        if 'files' in listing['info']:
+            listing['info']['fileinfo'] = {}
+
+            for file in listing['info']['files']:
+                path = listing['info']['path'] + file
+                fileinfo = self.__client.list(path)
+                infmt = '%j%Y%H%M%S%z'
+                outfmt = '%a %d %b %Y, %I:%M:%S %p'
+
+                if fileinfo != None and fileinfo['status'] == 'ok':
+                    parsedinfo = {}
+                    size = fileinfo['info']['size']
+                    parsedinfo['size'] = self.__shortensize(size)
+
+                    moment = fileinfo['info']['created']
+                    moment = time.strptime(moment, infmt)
+                    moment = time.strftime(outfmt, moment)
+                    parsedinfo['created'] = moment
+
+                    moment = fileinfo['info']['modified']
+                    moment = time.strptime(moment, infmt)
+                    moment = time.strftime(outfmt, moment)
+                    parsedinfo['modified'] = moment
+
+                    listing['info']['fileinfo'][file] = parsedinfo
 
     def __filelist_select(self, event):
         sel = self.__filelist.selection()
@@ -340,32 +458,12 @@ class Application:
             listing = self.__client.list(path)
 
             if listing != None and listing['status'] == 'ok':
-                if 'files' in listing['info']:
-                    listing['info']['fileinfo'] = {}
+                if len(self.__listings_forward) > 0:
+                    fwdpath = self.__listings_forward[-1]['info']['path'][:-1]
+                    if fwdpath == path: self.__listings_forward.pop()
+                    else: self.__listings_forward = []
 
-                    for file in listing['info']['files']:
-                        path = listing['info']['path'] + file
-                        fileinfo = self.__client.list(path)
-                        infmt = '%j%Y%H%M%S%z'
-                        outfmt = '%a %d %b %Y, %I:%M:%S %p'
-
-                        if fileinfo != None and fileinfo['status'] == 'ok':
-                            parsedinfo = {}
-                            size = fileinfo['info']['size']
-                            parsedinfo['size'] = self.__shortensize(size)
-
-                            moment = fileinfo['info']['created']
-                            moment = time.strptime(moment, infmt)
-                            moment = time.strftime(outfmt, moment)
-                            parsedinfo['created'] = moment
-
-                            moment = fileinfo['info']['modified']
-                            moment = time.strptime(moment, infmt)
-                            moment = time.strftime(outfmt, moment)
-                            parsedinfo['modified'] = moment
-
-                            listing['info']['fileinfo'][file] = parsedinfo
-
+                self.__listing_fetch_details(listing)
                 self.__listings.append(listing)
                 self.__display_listing()
 
@@ -459,7 +557,7 @@ class Application:
 
     def __update_task(self, key, name, values=None, image=None):
         params = {}
-        
+
         if values != None: params['values'] = values
         if image != None: params['image'] = image
 
@@ -569,6 +667,7 @@ class Application:
             self.__tasklist_current_selection = None
             self.__dl_tasks = []
             self.__listings = []
+            self.__listings_forward = []
 
             self.__display_listing()
 
@@ -578,8 +677,7 @@ class Application:
             self.__single_task_buttons_update()
             self.__all_tasks_buttons_update()
 
-            if not forquit:
-                self.__filelist_address_bar_state('go')
+            if not forquit: self.__filelist_address_bar_state('go')
 
     def __exit(self):
         if not self.__exit_in_progress:
