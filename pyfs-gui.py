@@ -59,8 +59,13 @@ class Application:
         self.__tk.grid_rowconfigure(0, weight=1)
         self.__tk.grid_columnconfigure(0, weight=1)
 
+        self.__icon_go = self.__load_icon('icons/go.png')
+        self.__icon_disconnect = self.__load_icon('icons/disconnect.png')
+        self.__icon_back = self.__load_icon('icons/backward.png')
+
         self.__icon_file = self.__load_icon('icons/file.png')
         self.__icon_folder = self.__load_icon('icons/folder.png')
+        self.__icon_done = self.__load_icon('icons/done.png')
 
         self.__icon_pause_all = self.__load_icon('icons/pause_all.png')
         self.__icon_resume_all = self.__load_icon('icons/resume_all.png')
@@ -95,7 +100,8 @@ class Application:
         self.__panes.insert('end', self.__tasksframe)
 
         self.__filelist_back_button = ttk.Button(
-            master=self.__filesframe, text='Back', command=self.__filelist_back
+            master=self.__filesframe, text='Back',
+            command=self.__filelist_back, image=self.__icon_back
         )
 
         self.__filelist_back_button.grid(row=0, column=0, sticky=tk.E)
@@ -113,7 +119,8 @@ class Application:
         )
 
         self.__filelist_go_button = ttk.Button(
-            master=self.__filesframe, text='Go', command=self.__filelist_go
+            master=self.__filesframe, text='Go', command=self.__filelist_go,
+            image=self.__icon_go
         )
 
         self.__filelist_go_button.grid(row=0, column=2, sticky=tk.W)
@@ -247,10 +254,7 @@ class Application:
             if not self.__client.server_ok(): self.__client = None
             return False
 
-        self.__disable_widget(self.__filelist_address_bar)
-        #self.__disable_widget(self.__filelist_go_button)
-        self.__filelist_go_button['text'] = 'Disconnect'
-        self.__filelist_go_button['command'] = self.__disconnect
+        self.__filelist_address_bar_state('disconnect')
 
         self.__listings = [listing]
         self.__display_listing()
@@ -303,6 +307,19 @@ class Application:
     def __filelist_go(self):
         address = self.__address_bar_value.get()
         self.connect_to(address)
+
+    def __filelist_address_bar_state(self, state):
+        if state == 'disconnect':
+            self.__filelist_go_button['text'] = 'Disconnect'
+            self.__filelist_go_button['command'] = self.__disconnect
+            self.__filelist_go_button['image'] = self.__icon_disconnect
+            self.__disable_widget(self.__filelist_address_bar)
+
+        elif state == 'go':
+            self.__filelist_go_button['text'] = 'Go'
+            self.__filelist_go_button['command'] = self.__filelist_go
+            self.__filelist_go_button['image'] = self.__icon_go
+            self.__enable_widget(self.__filelist_address_bar)
 
     def __address_bar_activate(self, event): self.__filelist_go()
 
@@ -440,22 +457,16 @@ class Application:
         self.__dl_tasks = remaining
         self.__all_tasks_buttons_update()
 
-    def __update_task(self, key, name, values=None):
+    def __update_task(self, key, name, values=None, image=None):
+        params = {}
+        
+        if values != None: params['values'] = values
+        if image != None: params['image'] = image
 
         if self.__tasklist.exists(key):
-            if values != None: self.__tasklist.item(
-                key, text=name, values=values
-            )
+            self.__tasklist.item(key, text=name, **params)
 
-            else: self.__tasklist.insert(key, text=name, values=())
-
-        else:
-
-            if values != None: self.__tasklist.insert(
-                '', 'end', iid=key, text=name, values=values
-            )
-
-            else: self.__tasklist.insert('', 'end', iid=key, text=name)
+        else: self.__tasklist.insert('', 'end', iid=key, text=name, **params)
 
     def __download_progress_pre(self, data): self.__dl_updates.append(data)
 
@@ -510,7 +521,7 @@ class Application:
             self.__dl_tasks[path]['done'] = True
 
         elif status == 'filedone':
-            self.__update_task(path, tname, ('Done'))
+            self.__update_task(path, tname, ('Done'), self.__icon_done)
             self.__dl_tasks[path]['done'] = True
 
         elif status == 'filepaused':
@@ -568,11 +579,7 @@ class Application:
             self.__all_tasks_buttons_update()
 
             if not forquit:
-                self.__enable_widget(self.__filelist_address_bar)
-                self.__enable_widget(self.__filelist_go_button)
-
-                self.__filelist_go_button['text'] = 'Go'
-                self.__filelist_go_button['command'] = self.__filelist_go
+                self.__filelist_address_bar_state('go')
 
     def __exit(self):
         if not self.__exit_in_progress:
