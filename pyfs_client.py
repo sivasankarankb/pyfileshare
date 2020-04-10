@@ -11,6 +11,7 @@
 # Add directory downloading
 # Add I/O layering for compression and encryption
 # Option for hash check disable (TCP/IP already does this right?)
+# Split this file into many - at least 3
 # Move download manager process management into it's class
 # Split download manager into functions
 # Add a monitor thread and instant response pipe to download manager process

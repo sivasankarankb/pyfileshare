@@ -5,9 +5,13 @@
 
 # Copyright (c) 2020 Sivasankaran K B
 
+# Issue: When sharing Windows drives the listing.info.name field is blank
+
 #TODO:
 # Have server return more info when listing (maybe)
 # Add I/O layering for compression and encryption
+# Add classes to prepare, jsonify and access listings and such
+# Make a utlilities library that the client and server can share.
 
 import io
 import time

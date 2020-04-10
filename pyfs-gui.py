@@ -20,6 +20,7 @@
 # Integrate server into UI (maybe, probably)
 # Breadcrumbs or other indication (address/path) of current location
 # Do useful things with the title bar text?
+# Split the file into many - at least 3
 
 import math
 import time
