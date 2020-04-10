@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+# pyfileshare Server (pyfs-server.py)
+# Version 0.1
+
+# Copyright (c) 2020 Sivasankaran K B
+
+#TODO:
+# Have server return more info when listing (maybe)
+# Add I/O layering for compression and encryption
+
 import io
 import time
 import pathlib
@@ -8,14 +17,15 @@ import hashlib
 import bottle
 import cherrypy
 
-# What paths to make available for sharing.
+# What paths to make available for sharing. Format is sharename: path.
 shares = {'siva': '/home/siva'}
+
+# Not partcularly useful as of yet.
+server_name = 'manjodell'
 
 file_chunk_size_default = 1024 * 1024
 file_chunk_size_min = 512
 file_chunk_size_max = 32 * 1024 * 1024
-
-server_name = 'manjodell'
 
 # -----------------------------------------------------------------------------
 

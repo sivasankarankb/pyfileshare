@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
+# pyfileshare Client utilities and CLI (pyfs-client.py)
+# Version 0.1
+
+# Copyright (c) 2020 Sivasankaran K B
+
 #TODO:
-# Add a graphical user interface
 # Move file download progress saving into client (save server ip as well)
 # Check file hash when resuming a file after app (exit and) restart
 # Add directory downloading
 # Add I/O layering for compression and encryption
-# Option for hash check disable
+# Option for hash check disable (TCP/IP already does this right?)
 # Move download manager process management into it's class
 # Split download manager into functions
 # Add a monitor thread and instant response pipe to download manager process
@@ -16,10 +20,6 @@
 # Auto detect local network pyfs servers
 # Evaluate what methods and fields need to stay private
 # Documentation - comments and docstrings
-
-#DONE:
-# Progress and speed monitoring on download tasks
-# App not exiting when downloads active
 
 import math
 import io

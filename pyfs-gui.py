@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 
-import math
-import time
-import statistics
+# pyfileshare GUI (pyfs-gui.py)
+# Version 0.1
 
-import tkinter as tk
-from tkinter import ttk
-
-from pyfs_client import PyFSClient
+# Copyright (c) 2020 Sivasankaran K B
 
 # Issue: Pausing tasks, disconnecting, reconnecting and resuming tasks
 #        will not check if right server (no server address stored).
@@ -22,9 +18,17 @@ from pyfs_client import PyFSClient
 # Add icons for action buttons, files and folders
 # Add sorting by file size, dates, (type maybe?), consideration for grouping?
 # Integrate server into UI (maybe, probably)
-# Have server return more info when listing (maybe)
 # Breadcrumbs or other indication (address/path) of current location
 # Do useful things with the title bar text?
+
+import math
+import time
+import statistics
+
+import tkinter as tk
+from tkinter import ttk
+
+from pyfs_client import PyFSClient
 
 class Application:
     def __create_treeview(self, master, columns):
