@@ -24,9 +24,9 @@ the following commands. You may need administrative previleges.
 Use ```pip3``` instead of ```pip``` on Linux as both Python 2 and 3
 are usually pre-installed.
 
-For using the client run ```pip install requests```.
+Client requirements: ```pip install requests```.
 
-For running the server do ```pip install bottle cherrypy```.
+Server requirements: ```pip install bottle cherrypy```.
 
 Lastly, either clone this repository with ```git clone repository_url```
 or download a ZIP file (especially useful if you are on Windows) to get
@@ -93,10 +93,14 @@ Finally, we are here. Just double click ```pyfs-gui.py``` on Windows.
 On a Linux distro, open a terminal window and point it to the app directory.
 Then run ```python3 pyfs-gui.py```.
 
-Type in the IP address and port of the server. The address format
+Type in the IP address and port of the server machine. The address format
 is ```http://ipaddress:portnumber```. The default port is ```8080```.
 To get the IP address of a machine, check the properties of your network
 device or use ```ipconfig``` in a PowerShell or Command Prompt on Windows.
 
 Run ```ip address```, ```sudo ifconfig``` or look in the hardware, network
-or connection information on Linux.
+or connection information on Linux. If you're using the Linux command line
+tools, look for the line that says ```inet```.
+
+Double click on a file to download it to the pyfileshare directory.
+Saving files to other places will be implemented in the near future.
