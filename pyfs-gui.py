@@ -10,16 +10,16 @@
 #        Best to concel tasks before disconnecting.
 
 # Issue: There is no retry for failed info queries.
-# Issue: Time string parse errors (ValueErrors)  are not handled at all
+# Issue: Time string parse errors (ValueErrors) are not handled at all
 
 #TODO:
-# Add a forward navigation button to file browser (maybe)
-# Add a refresh button to file browser
-# Add icons for action buttons, files and folders
-# Add sorting by file size, dates, (type maybe?), consideration for grouping?
+# Add logo and icon for application
+# Menus, Preferences, help, about box
+# Bookmarking server addresses
+# Keyboard shortcuts
+# Change download location (even when downloading?)
+# Sorting by file size, dates, (type maybe?), consideration for grouping?
 # Integrate server into UI (maybe, probably)
-# Breadcrumbs or other indication (address/path) of current location
-# Do useful things with the title bar text?
 # Split the file into many - at least 3
 
 import math
