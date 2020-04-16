@@ -3,14 +3,26 @@ An HTTP based file sharing application written in Python.
 
 ## Concept
 The `pyfileshare` concept of sharing is unrestricted, progressive reading
-of files and listing of directories (folders and/or drives).
+of files and listing of directories (folders and/or drives). The application
+is divided into two main parts. The server which provides the file sharing
+functionality and the client to view and download files.
 
-The application is divided into two main parts. The server which provides
-the file sharing functionality and the client to view and download files.
+Install the server on the machine from which the files are to be shared.
+Then add each directory you want to share to the server's settings, giving
+it a share name.
 
-You simply add each directory you want to share to the server's settings,
-giving it a share name. Enter the address of the server in the client
-and press go.
+Install the client on any machine from which you wish to access the files.
+Enter the address of the server machine in the client and press go.
+
+While `pyfileshare` is best used on local networks such as your home or office,
+it can be accessed from anywhere around the world, if the server port used
+is forwarded by your ISP. Remember that shared files are accessible
+to __everybody__ that can connect to your machine. Do not put private files
+in shared locations.
+
+Currently, file transfers are __insecure__. No encryption is used. Anybody
+that can see your network traffic can grab the content of the transferred
+files. __Strong encryption__ will be added in the near future.
 
 ## Installation
 First install a recent version of Python 3 from https://python.org.
@@ -32,6 +44,10 @@ Lastly, either clone this repository with `git clone repository_url`
 or download a ZIP file (especially useful if you are on Windows) to get
 the application files. Get the repository URL or ZIP file from the green
 clone button above. Extract the ZIP file where ever you want.
+
+__Note__: I cannot verify the application's working on MacOS as don't have
+access to an Apple machine. But the Linux instructions should work for Mac.
+Don't forget to install the latest Python 3 from the Python website.
 
 ## Setting up file sharing
 Sharing is done by allowing access to a directory on the computer.
@@ -57,7 +73,7 @@ shares = {
 
 __Windows sharing example:__
 
-Suppose you want to the E Drive and your Downloads folder:
+Suppose you want to share the E Drive and your Downloads folder:
 
 ```python
 shares = {
@@ -71,16 +87,13 @@ Note the __double backslashes__ used inside the paths.
 Edit the name of the server by changing the `server_name` line.
 This not of any particular use as of now, though.
 
-To change the IP address andport number that the server listens on,
+To change the IP address and port number that the server listens on,
 go to the end of the file and change the `server.socket_host` and
 the `server.socket_port` lines.
 
-The server listens on all interfaces (e.g. Ethernet [LAN], WiFi, Bluetooth)
+The server listens on all interfaces (e.g. Ethernet (LAN), WiFi, Bluetooth)
 by default. You can change this by setting the IP address to that of
-the interface you want to listen to.
-
-The port used is `8080` by default. You will need administrative previleges
-to use a port less than or equal to `1024`.
+the interface you want to listen to. The port used is `8080` by default.
 
 If you don't understand these, just leave them as is.
 
@@ -98,9 +111,13 @@ is `http://ipaddress:portnumber`. The default port is `8080`. Double click
 on a file to download it to the pyfileshare directory. Saving files to other
 places will be implemented in the near future.
 
+For those of you who don't know what an IP address is, it looks like this:
+`192.168.1.110` - a sequence of four numbers, separated by dots.
+
 To get the IP address of a machine, check the properties of your network
 device or use `ipconfig` in a PowerShell or Command Prompt on Windows.
+Look for the lines that say `IPv4 Address`.
 
 Run `ip address`, `sudo ifconfig` or look in the network or connection
 information on Linux. If you're using the Linux command line tools, look
-for the line that says `inet`.
+for the lines that say `inet`.
