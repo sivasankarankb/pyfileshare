@@ -9,10 +9,9 @@ functionality and the client to view and download files.
 
 Install the server on the machine from which the files are to be shared.
 Then add each directory you want to share to the server's settings, giving
-it a share name.
-
-Install the client on any machine from which you wish to access the files.
-Enter the address of the server machine in the client and press go.
+it a share name. Install the client on any machine from which you wish
+to access the files. Enter the address of the server machine in the client
+and press go.
 
 While `pyfileshare` is best used on local networks such as your home or office,
 it can be accessed from anywhere around the world, if the server port used
@@ -45,7 +44,7 @@ or download a ZIP file (especially useful if you are on Windows) to get
 the application files. Get the repository URL or ZIP file from the green
 clone button above. Extract the ZIP file where ever you want.
 
-__Note__: I cannot verify the application's working on MacOS as don't have
+__Note__: I cannot verify the application's working on MacOS as I don't have
 access to an Apple machine. But the Linux instructions should work for Mac.
 Don't forget to install the latest Python 3 from the Python website.
 
@@ -85,11 +84,9 @@ shares = {
 Note the __double backslashes__ used inside the paths.
 
 Edit the name of the server by changing the `server_name` line.
-This not of any particular use as of now, though.
-
-To change the IP address and port number that the server listens on,
-go to the end of the file and change the `server.socket_host` and
-the `server.socket_port` lines.
+This is not of any particular use as of now, though. To change the IP address
+and port number that the server listens on, go to the end of the file
+and change the `server.socket_host` and the `server.socket_port` lines.
 
 The server listens on all interfaces (e.g. Ethernet (LAN), WiFi, Bluetooth)
 by default. You can change this by setting the IP address to that of
@@ -98,13 +95,14 @@ the interface you want to listen to. The port used is `8080` by default.
 If you don't understand these, just leave them as is.
 
 ## Running the server
-Double click `pyfs-server.py` on Windows. Run `python3 pyfs-server.py`
-from inside the application directory in a terminal on Linux.
+Double click `pyfs-server.py` on Windows. Run `./pyfs-server.py` or
+`python3 pyfs-server.py` from inside the application directory
+in a terminal on Linux.
 
 ## Running the client
 Finally, we are here. Just double click `pyfs-gui.py` on Windows.
 On a Linux distro, open a terminal window and point it to the app directory.
-Then run `python3 pyfs-gui.py`.
+Then run `./pyfs-gui.py` or `python3 pyfs-gui.py`.
 
 Type in the IP address and port of the server machine. The address format
 is `http://ipaddress:portnumber`. The default port is `8080`. Double click
@@ -112,10 +110,9 @@ on a file to download it to the pyfileshare directory. Saving files to other
 places will be implemented in the near future.
 
 For those of you who don't know what an IP address is, it looks like this:
-`192.168.1.110` - a sequence of four numbers, separated by dots.
-
-To get the IP address of a machine, check the properties of your network
-device or use `ipconfig` in a PowerShell or Command Prompt on Windows.
+`192.168.1.110` - a sequence of four numbers, separated by dots. To get
+the IP address of a machine, check the properties of your network device
+or use `ipconfig` in a PowerShell or Command Prompt on Windows.
 Look for the lines that say `IPv4 Address`.
 
 Run `ip address`, `sudo ifconfig` or look in the network or connection
