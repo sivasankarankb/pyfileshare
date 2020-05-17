@@ -406,9 +406,13 @@ class PyFSClient(ClientLogic):
         self.__getfile_monitor_thread_stop = True
         self.__getfile_monitor_thread.join()
 
-    def getfile(self, path, callback=None):
+    def getfile(self, path, callback=None, saveto=None):
         self.__getfile_pipe_lock.acquire()
-        self.__getfile_pipe.send({'command': 'file', 'path': path})
+        command = {'command': 'file', 'path': path}
+
+        if saveto != None: command['saveto'] = saveto
+
+        self.__getfile_pipe.send(command)
         self.__getfile_pipe_lock.release()
 
     def getfile_pause(self, target=None):
