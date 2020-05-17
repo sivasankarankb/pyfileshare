@@ -25,8 +25,10 @@
 import math
 import time
 import statistics
+import pathlib
 
 import tkinter as tk
+import tkinter.filedialog as tk_filedialog
 from tkinter import ttk
 
 from pyfs_client import PyFSClient
@@ -294,6 +296,15 @@ class Application:
         self.__all_tasks_buttons_update()
         self.__set_title()
 
+        self.__menubar = tk.Menu(self.__tk)
+        self.__menubar.add(
+            tk.COMMAND, label='Preferences', command=self.__pref_menu
+        )
+
+        self.__tk['menu'] = self.__menubar
+
+        self.__prefs_load()
+
     def __set_title(self, title=''):
         if title != '': title = 'pyfs - ' + title
         else: title = 'pyfs'
@@ -473,7 +484,16 @@ class Application:
                 self.__display_listing()
 
         elif 'files' in info and sel in info['files']:
-            self.__client.getfile(path)
+            params = {}
+
+            if 'download_folder' in self.__prefs:
+                d = pathlib.Path(self.__prefs['download_folder']).resolve()
+
+                if d.exists() and d.is_dir():
+                    d = d / sel
+                    params['saveto'] = str(d)
+
+            self.__client.getfile(path, **params)
 
     def __single_task_buttons_update(self, task=None):
         if task != None:
@@ -660,6 +680,98 @@ class Application:
             self.__single_task_buttons_update(path)
 
         self.__all_tasks_buttons_update()
+
+    def __pref_menu(self):
+        self.__pref_window = tk.Toplevel(self.__tk)
+        self.__pref_window.title('Preferences')
+        self.__pref_window.transient(self.__tk)
+
+        destlabel = ttk.Label(self.__pref_window, text='Download folder:')
+        destlabel.grid(row=1, column=1, padx=8, pady=8)
+
+        self.__pref_download_dest_text = ttk.Entry(self.__pref_window)
+        self.__pref_download_dest_text.grid(
+            row=1, column=2, columnspan=2, padx=(0,8), pady=8
+        )
+
+        if 'download_folder' in self.__prefs:
+            dest = self.__prefs['download_folder']
+
+        else: dest = 'Application Folder'
+
+        self.__pref_download_dest_text.insert(0, dest)
+
+        self.__pref_download_dest_button = ttk.Button(
+            self.__pref_window, text='Browse',
+            command=self.__pref_menu_download_dest_select
+        )
+
+        self.__pref_download_dest_button.grid(
+            row=1, column=4, pady=8, padx=(0,8)
+        )
+
+        self.__pref_ok_button = ttk.Button(
+            self.__pref_window, text='Ok', command=self.__pref_ok
+        )
+
+        self.__pref_ok_button.grid(
+            row=2, column=3, padx=8, pady=(0,8), sticky=tk.E
+        )
+
+        self.__pref_cancel_button = ttk.Button(
+            self.__pref_window, text='Cancel',
+            command=self.__pref_window.destroy
+        )
+
+        self.__pref_cancel_button.grid(
+            row=2, column=4, padx=(0,8), pady=(0,8), sticky=tk.W
+        )
+
+    def __pref_menu_download_dest_select(self):
+        dir = tk_filedialog.askdirectory()
+        if dir != '':
+            text = self.__pref_download_dest_text.get() #TODO: Improve
+            self.__pref_download_dest_text.delete(0, len(text))
+            self.__pref_download_dest_text.insert(0, dir)
+
+    def __pref_download_dest_set(self, dest=''):
+        if dest != 'Application Folder' and dest != '':
+            p = pathlib.Path(dest)
+
+            if p.exists() and p.is_dir():
+                self.__prefs['download_folder'] = dest
+                return True
+
+        return False
+
+    def __pref_ok(self):
+        dest = self.__pref_download_dest_text.get().strip()
+        self.__pref_download_dest_set(dest)
+
+        self.__prefs_save()
+        self.__pref_window.destroy()
+
+    def __prefs_load(self):
+        self.__prefs = {}
+
+        try: prefs = open('prefs', 'rt')
+        except: return False
+
+        for ln in prefs:
+            try: self.__prefs[ln[: ln.index('=')]] = ln[ln.index('=') + 1 : -1]
+            except: pass
+
+        prefs.close()
+        return True
+
+    def __prefs_save(self):
+        try: prefs = open('prefs', 'wt')
+        except: return False
+
+        for k in self.__prefs: prefs.write(k + '=' + self.__prefs[k] + '\n')
+
+        prefs.close()
+        return True
 
     def __disconnect(self, forquit=False):
         if self.__client != None:
