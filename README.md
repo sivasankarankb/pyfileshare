@@ -24,6 +24,8 @@ that can see your network traffic can grab the content of the transferred
 files. __Strong encryption__ will be added in the near future.
 
 ## Installation
+To try pyfileshare:
+
 1. Get a copy from the
    [releases](https://github.com/sivasankarankb/pyfileshare/releases) page.
    
