@@ -24,12 +24,10 @@ that can see your network traffic can grab the content of the transferred
 files. __Strong encryption__ will be added in the near future.
 
 ## Installation
-1. Either clone this repository with `git clone repository_url`
-   or download a ZIP file (especially useful if you are on Windows) to get
-   the application files. Get the repository URL or ZIP file from the green
-   clone button above.
+1. Get a copy from the
+   [releases](https://github.com/sivasankarankb/pyfileshare/releases) page.
    
-2. Extract the ZIP file where ever you want.
+2. Extract the code where ever you want.
 
 3. Install a recent version of Python 3 from https://python.org.
    If you're on a GNU/Linux distro, you probably already have Python.
