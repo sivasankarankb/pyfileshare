@@ -37,10 +37,6 @@ To try pyfileshare:
 4. Get the packages required by pyfileshare by running
    `pip3 install -r requirements.txt` inside the code directory from a terminal.
 
-__Note__: I cannot verify the application's working on MacOS as I don't have
-access to an Apple machine. But the Linux instructions should work for Mac.
-Don't forget to install the latest Python 3 from the Python website.
-
 ## Setting up file sharing
 Sharing is done by allowing access to a directory on the computer.
 Open the `pyfs-server.py` file. This contains code of the server.
