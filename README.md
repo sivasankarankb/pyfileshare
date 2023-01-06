@@ -34,7 +34,11 @@ To try pyfileshare:
 3. Install [Python 3.x](https://www.python.org) if you're on Windows or macOS.
    Windows users must enable the _Add Python to PATH_ setup option.
 
-4. Get the packages required by pyfileshare by running
+4. To keep things clean, create a
+   [virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment)
+   with `venv` and enter it.
+
+5. Get the packages required by pyfileshare by running
    `pip3 install -r requirements.txt` inside the code directory from a terminal.
 
 ## Setting up file sharing
