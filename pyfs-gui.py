@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 
-# pyfileshare GUI (pyfs-gui.py)
-# Version 0.1
-
-# Copyright (c) 2020 Sivasankaran K B
-
 import math
 import time
 import statistics

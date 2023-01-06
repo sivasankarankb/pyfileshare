@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 
-# pyfileshare Client utilities and CLI (pyfs-client.py)
-# Version 0.1
-
-# Copyright (c) 2020 Sivasankaran K B
-
 import math
 import io
 import time
