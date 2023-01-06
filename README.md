@@ -21,7 +21,7 @@ in shared locations.
 
 Currently, file transfers are __insecure__. No encryption is used. Anybody
 that can see your network traffic can grab the content of the transferred
-files. __Strong encryption__ will be added in the near future.
+files.
 
 ## Installation
 To try pyfileshare:
@@ -99,8 +99,7 @@ Then run `./pyfs-gui.py` or `python3 pyfs-gui.py`.
 
 Type in the IP address and port of the server machine. The address format
 is `http://ipaddress:portnumber`. The default port is `8080`. Double click
-on a file to download it to the pyfileshare directory. Saving files to other
-places will be implemented in the near future.
+on a file to download it to the pyfileshare directory.
 
 For those of you who don't know what an IP address is, it looks like this:
 `192.168.1.110` - a sequence of four numbers, separated by dots. To get
