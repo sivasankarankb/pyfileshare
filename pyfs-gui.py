@@ -5,23 +5,6 @@
 
 # Copyright (c) 2020 Sivasankaran K B
 
-# Issue: Pausing tasks, disconnecting, reconnecting and resuming tasks
-#        will not check if right server (no server address stored).
-#        Best to concel tasks before disconnecting.
-
-# Issue: There is no retry for failed info queries.
-# Issue: Time string parse errors (ValueErrors) are not handled at all
-
-#TODO:
-# Add logo and icon for application
-# Menus, Preferences, help, about box
-# Bookmarking server addresses
-# Keyboard shortcuts
-# Change download location (even when downloading?)
-# Sorting by file size, dates, (type maybe?), consideration for grouping?
-# Integrate server into UI (maybe, probably)
-# Split the file into many - at least 3
-
 import math
 import time
 import statistics

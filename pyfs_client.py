@@ -5,23 +5,6 @@
 
 # Copyright (c) 2020 Sivasankaran K B
 
-#TODO:
-# Move file download progress saving into client (save server ip as well)
-# Check file hash when resuming a file after app (exit and) restart
-# Add directory downloading
-# Add I/O layering for compression and encryption
-# Option for hash check disable (TCP/IP already does this right?)
-# Split this file into many - at least 3
-# Move download manager process management into it's class
-# Split download manager into functions
-# Add a monitor thread and instant response pipe to download manager process
-# Chunk size changing and dynamic calculation
-# Multiple servers at a time support
-# Better handling of failed network accesses (timeouts, retries)
-# Auto detect local network pyfs servers
-# Evaluate what methods and fields need to stay private
-# Documentation - comments and docstrings
-
 import math
 import io
 import time
