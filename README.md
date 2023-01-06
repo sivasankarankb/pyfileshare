@@ -34,16 +34,8 @@ To try pyfileshare:
 3. Install [Python 3.x](https://www.python.org) if you're on Windows or macOS.
    Windows users must enable the _Add Python to PATH_ setup option.
 
-4. Install the additional requirements with python's `pip`.
-   Open a terminal (Command Prompt or PowerShell on Windows) and type in
-   the following commands. You may need administrative previleges.
-
-   Use `pip3` instead of `pip` on Linux as both Python 2 and 3
-   are usually pre-installed.
-
-   Client requirements: `pip install requests`.
-
-   Server requirements: `pip install bottle cherrypy`.
+4. Get the packages required by pyfileshare by running
+   `pip3 install -r requirements.txt` inside the code directory from a terminal.
 
 __Note__: I cannot verify the application's working on MacOS as I don't have
 access to an Apple machine. But the Linux instructions should work for Mac.
