@@ -29,7 +29,7 @@ To try pyfileshare:
 1. Get a copy from the
    [releases](https://github.com/sivasankarankb/pyfileshare/releases) page.
    
-2. Extract the code where ever you want.
+2. Extract the code wherever you want.
 
 3. Install [Python 3.x](https://www.python.org) if you're on Windows or macOS.
    Windows users must enable the _Add Python to PATH_ setup option.
