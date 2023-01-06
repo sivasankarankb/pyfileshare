@@ -24,11 +24,18 @@ that can see your network traffic can grab the content of the transferred
 files. __Strong encryption__ will be added in the near future.
 
 ## Installation
-1. Install a recent version of Python 3 from https://python.org.
+1. Either clone this repository with `git clone repository_url`
+   or download a ZIP file (especially useful if you are on Windows) to get
+   the application files. Get the repository URL or ZIP file from the green
+   clone button above.
+   
+2. Extract the ZIP file where ever you want.
+
+3. Install a recent version of Python 3 from https://python.org.
    If you're on a GNU/Linux distro, you probably already have Python.
    Windows users must make sure to enable the _Add Python to PATH_ setup option.
 
-2. Install the additional requirements with python's `pip`.
+4. Install the additional requirements with python's `pip`.
    Open a terminal (Command Prompt or PowerShell on Windows) and type in
    the following commands. You may need administrative previleges.
 
@@ -38,13 +45,6 @@ files. __Strong encryption__ will be added in the near future.
    Client requirements: `pip install requests`.
 
    Server requirements: `pip install bottle cherrypy`.
-
-3. Either clone this repository with `git clone repository_url`
-   or download a ZIP file (especially useful if you are on Windows) to get
-   the application files. Get the repository URL or ZIP file from the green
-   clone button above.
-   
-4. Extract the ZIP file where ever you want.
 
 __Note__: I cannot verify the application's working on MacOS as I don't have
 access to an Apple machine. But the Linux instructions should work for Mac.
