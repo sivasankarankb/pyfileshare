@@ -29,9 +29,8 @@ files. __Strong encryption__ will be added in the near future.
    
 2. Extract the code where ever you want.
 
-3. Install a recent version of Python 3 from https://python.org.
-   If you're on a GNU/Linux distro, you probably already have Python.
-   Windows users must make sure to enable the _Add Python to PATH_ setup option.
+3. Install [Python 3.x](https://www.python.org) if you're on Windows or macOS.
+   Windows users must enable the _Add Python to PATH_ setup option.
 
 4. Install the additional requirements with python's `pip`.
    Open a terminal (Command Prompt or PowerShell on Windows) and type in
