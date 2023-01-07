@@ -14,6 +14,9 @@ shares = {'siva': '/home/siva'}
 # Not partcularly useful as of yet.
 server_name = 'manjodell'
 
+server_listen_ip = '0.0.0.0'
+server_listen_port = 8080
+
 file_chunk_size_default = 1024 * 1024
 file_chunk_size_min = 512
 file_chunk_size_max = 32 * 1024 * 1024
@@ -146,8 +149,8 @@ def read_file_part(sharename, path):
     else: return {'status': 'error', 'reason': 'not exist'}
 
 cherrypy.config.update({
-                           'server.socket_host': '0.0.0.0',
-                           'server.socket_port': 8080
+                           'server.socket_host': server_listen_ip,
+                           'server.socket_port': server_listen_port
 })
 
 cherrypy.tree.graft(app, '/')
