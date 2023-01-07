@@ -13,9 +13,7 @@ import cherrypy
 # What paths to make available for sharing. Format is sharename: path.
 shares = {'siva': '/home/siva'}
 
-# Not partcularly useful as of yet.
 server_name = 'manjodell'
-
 server_listen_ip = '0.0.0.0'
 server_listen_port = 8080
 
@@ -29,7 +27,6 @@ app = bottle.Bottle()
 
 def time_convert(seconds):
     moment = time.localtime(seconds)
-    # I liked "%A, %d %b %Y, %I:%M:%S %p %Z (UTC%z)"
     return time.strftime("%j%Y%H%M%S%z", moment)
 
 @app.route('/')
