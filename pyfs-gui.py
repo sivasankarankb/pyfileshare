@@ -50,7 +50,6 @@ class Application:
         screenheight = self.__tk.winfo_screenheight()
 
         width = min(int(0.95 * screenwidth), 1280)
-        #height = int(0.8 * screenheight)
         height = 600
         winleft = int((screenwidth - width) / 2)
         wintop = int((screenheight - height) / 2)
@@ -265,7 +264,6 @@ class Application:
         self.__tasksframe.grid_columnconfigure(0, weight=1)
         self.__tasksframe.grid_columnconfigure(5, weight=1)
 
-        # was bound to <TreeviewSelect>
         self.__filelist.bind('<Double-ButtonPress-1>', self.__filelist_select)
 
         self.__tasklist.bind('<<TreeviewSelect>>', self.__tasklist_select)
