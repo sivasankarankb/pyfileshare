@@ -1,14 +1,11 @@
 # pyfileshare
 An HTTP based file sharing application written in Python.
 
-## Concept
-The `pyfileshare` concept of sharing is unrestricted, progressive reading
-of files and listing of directories (folders, drives). The application
-is divided into two main parts. The server which provides the file sharing
-functionality and the client to view and download files.
+The server application provides access to files and directories (folders) on
+a machine to anybody that can connect to it. No passwords or other
+authentication are required.
 
-Remember that shared files are accessible to __everybody__ that can connect to
-your machine. Do not put private files in shared locations.
+The client is used to view and download files.
 
 ## Installation
 To try pyfileshare:
