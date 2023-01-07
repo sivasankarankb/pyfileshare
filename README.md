@@ -35,17 +35,17 @@ Edit the line that says `shares = { ... }`.
 
 __Linux (Unix) sharing examples:__
 
-Suppose you want to add `/home/user/` with the share name `yuser`:
+Suppose you want to add `/home/user/` with the share name `files`:
 
 ```python
-shares = {'yuser': '/home/user/'}
+shares = {'files': '/home/user/'}
 ```
 
 Let's add `/var/www/html` under the name `mirror` to this:
 
 ```python
 shares = {
-     'yuser': '/home/user/',
+     'files': '/home/user/',
      'mirror': '/var/www/html/'
 }
 ```
