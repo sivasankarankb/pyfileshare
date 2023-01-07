@@ -71,7 +71,9 @@ Do `python3 pyfs-server.py`.
 
 1. Do `python3 pyfs-gui.py`.
 
-2. Type in the IP address and port of the server machine. The address format
+2. Set up the Download directory by going to _Preferences_.
+
+3. Type in the IP address and port of the server machine. The address format
    is `http://ipaddress:portnumber`. The default port is `8080`.
 
-3. Double click on a file to download it to the pyfileshare directory.
+4. Double click on a file to download it.
