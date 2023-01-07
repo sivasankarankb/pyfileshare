@@ -63,17 +63,6 @@ shares = {
 
 Note the __double backslashes__ used inside the paths.
 
-Edit the name of the server by changing the `server_name` line.
-This is not of any particular use as of now, though. To change the IP address
-and port number that the server listens on, go to the end of the file
-and change the `server.socket_host` and the `server.socket_port` lines.
-
-The server listens on all interfaces (e.g. Ethernet (LAN), WiFi, Bluetooth)
-by default. You can change this by setting the IP address to that of
-the interface you want to listen to. The port used is `8080` by default.
-
-If you don't understand these, just leave them as is.
-
 ## Running the server
 Double click `pyfs-server.py` on Windows. Run `./pyfs-server.py` or
 `python3 pyfs-server.py` from inside the application directory
