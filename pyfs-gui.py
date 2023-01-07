@@ -49,7 +49,7 @@ class Application:
         screenwidth = self.__tk.winfo_screenwidth()
         screenheight = self.__tk.winfo_screenheight()
 
-        width = int(0.95 * screenwidth)
+        width = min(int(0.95 * screenwidth), 1280)
         #height = int(0.8 * screenheight)
         height = 600
         winleft = int((screenwidth - width) / 2)
