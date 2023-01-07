@@ -8,6 +8,8 @@ import hashlib
 import bottle
 import cherrypy
 
+# -- User configurable options --
+
 # What paths to make available for sharing. Format is sharename: path.
 shares = {'siva': '/home/siva'}
 
@@ -21,7 +23,7 @@ file_chunk_size_default = 1024 * 1024
 file_chunk_size_min = 512
 file_chunk_size_max = 32 * 1024 * 1024
 
-# -----------------------------------------------------------------------------
+# -- End of user configurable options --
 
 app = bottle.Bottle()
 
