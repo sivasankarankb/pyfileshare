@@ -276,6 +276,16 @@ class Application:
         self.__menubar.add(
             tk.COMMAND, label='Preferences', command=self.__pref_menu
         )
+        
+        help_menu = tk.Menu(self.__tk, tearoff=False)
+        
+        help_menu.add(
+            tk.COMMAND, label='About'
+        )
+        
+        self.__menubar.add(
+            tk.CASCADE, label='Help', menu=help_menu,
+        )
 
         self.__tk['menu'] = self.__menubar
 
