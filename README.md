@@ -64,25 +64,14 @@ shares = {
 Note the __double backslashes__ used inside the paths.
 
 ## Running the server
-Double click `pyfs-server.py` on Windows. Run `./pyfs-server.py` or
-`python3 pyfs-server.py` from inside the application directory
-in a terminal on Linux.
+
+Do `python3 pyfs-server.py`.
 
 ## Running the client
-Finally, we are here. Just double click `pyfs-gui.py` on Windows.
-On a Linux distro, open a terminal window and point it to the app directory.
-Then run `./pyfs-gui.py` or `python3 pyfs-gui.py`.
 
-Type in the IP address and port of the server machine. The address format
-is `http://ipaddress:portnumber`. The default port is `8080`. Double click
-on a file to download it to the pyfileshare directory.
+1. Do `python3 pyfs-gui.py`.
 
-For those of you who don't know what an IP address is, it looks like this:
-`192.168.1.110` - a sequence of four numbers, separated by dots. To get
-the IP address of a machine, check the properties of your network device
-or use `ipconfig` in a PowerShell or Command Prompt on Windows.
-Look for the lines that say `IPv4 Address`.
+2. Type in the IP address and port of the server machine. The address format
+   is `http://ipaddress:portnumber`. The default port is `8080`.
 
-Run `ip address`, `sudo ifconfig` or look in the network or connection
-information on Linux. If you're using the Linux command line tools, look
-for the lines that say `inet`.
+3. Double click on a file to download it to the pyfileshare directory.
