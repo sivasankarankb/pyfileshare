@@ -13,7 +13,7 @@ import cherrypy
 # What paths to make available for sharing. Format is sharename: path.
 shares = {'siva': '/home/siva'}
 
-server_name = 'manjodell'
+server_name = 'pyfileshare'
 server_listen_ip = '0.0.0.0'
 server_listen_port = 8080
 
