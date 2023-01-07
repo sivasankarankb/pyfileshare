@@ -662,7 +662,7 @@ class Application:
         self.__pref_window.title('Preferences')
         self.__pref_window.transient(self.__tk)
 
-        destlabel = ttk.Label(self.__pref_window, text='Download folder:')
+        destlabel = ttk.Label(self.__pref_window, text='Download to:')
         destlabel.grid(row=1, column=1, padx=8, pady=8)
 
         self.__pref_download_dest_text = ttk.Entry(self.__pref_window)
