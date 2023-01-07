@@ -282,8 +282,8 @@ class Application:
         self.__prefs_load()
 
     def __set_title(self, title=''):
-        if title != '': title = 'pyfs - ' + title
-        else: title = 'pyfs'
+        if title != '': title = 'pyfileshare - ' + title
+        else: title = 'pyfileshare'
 
         self.__tk.title(title)
 
