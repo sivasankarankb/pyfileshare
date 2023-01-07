@@ -3,25 +3,12 @@ An HTTP based file sharing application written in Python.
 
 ## Concept
 The `pyfileshare` concept of sharing is unrestricted, progressive reading
-of files and listing of directories (folders and/or drives). The application
+of files and listing of directories (folders, drives). The application
 is divided into two main parts. The server which provides the file sharing
 functionality and the client to view and download files.
 
-Install the server on the machine from which the files are to be shared.
-Then add each directory you want to share to the server's settings, giving
-it a share name. Install the client on any machine from which you wish
-to access the files. Enter the address of the server machine in the client
-and press go.
-
-While `pyfileshare` is best used on local networks such as your home or office,
-it can be accessed from anywhere around the world, if the server port used
-is forwarded by your ISP. Remember that shared files are accessible
-to __everybody__ that can connect to your machine. Do not put private files
-in shared locations.
-
-Currently, file transfers are __insecure__. No encryption is used. Anybody
-that can see your network traffic can grab the content of the transferred
-files.
+Remember that shared files are accessible to __everybody__ that can connect to
+your machine. Do not put private files in shared locations.
 
 ## Installation
 To try pyfileshare:
