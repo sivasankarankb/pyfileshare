@@ -313,8 +313,15 @@ class Application:
         self.__set_title()
 
         self.__menubar = tk.Menu(self.__tk)
-        self.__menubar.add(
+
+        edit_menu = tk.Menu(self.__tk, tearoff=False)
+
+        edit_menu.add(
             tk.COMMAND, label='Preferences', command=self.__pref_menu
+        )
+
+        self.__menubar.add(
+            tk.CASCADE, label='Edit', menu=edit_menu
         )
         
         help_menu = tk.Menu(self.__tk, tearoff=False)
