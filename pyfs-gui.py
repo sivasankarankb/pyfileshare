@@ -151,7 +151,7 @@ class Application:
         self.__panes.insert('end', self.__tasksframe)
 
         self.__style = ttk.Style()
-        self.__style.configure('TButton', relief='flat')
+        self.__style.configure('TButton', relief='solid')
         self.__style.configure('TEntry', relief='flat', padding=4)
         self.__style.configure('Treeview', rowheight=28)
 
