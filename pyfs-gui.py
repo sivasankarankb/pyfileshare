@@ -314,6 +314,16 @@ class Application:
 
         self.__menubar = tk.Menu(self.__tk)
 
+        file_menu = tk.Menu(self.__tk, tearoff=False)
+
+        file_menu.add(
+            tk.COMMAND, label='Exit', command=self.__exit
+        )
+
+        self.__menubar.add(
+            tk.CASCADE, label='File', menu=file_menu
+        )
+
         edit_menu = tk.Menu(self.__tk, tearoff=False)
 
         edit_menu.add(
