@@ -160,7 +160,9 @@ class Application:
             command=self.__filelist_back, image=self.__icon_back
         )
 
-        self.__filelist_back_button.grid(row=0, column=0, sticky=tk.E)
+        self.__filelist_back_button.grid(
+            row=0, column=0, sticky=tk.E, padx=(0, 8)
+        )
         self.__disable_widget(self.__filelist_back_button)
 
         self.__filelist_refresh_button = ttk.Button(
@@ -168,7 +170,7 @@ class Application:
             command=self.__filelist_refresh, image=self.__icon_refresh
         )
 
-        self.__filelist_refresh_button.grid(row=0, column=1)
+        self.__filelist_refresh_button.grid(row=0, column=1, padx=(0, 8))
         self.__disable_widget(self.__filelist_refresh_button)
 
         self.__filelist_forward_button = ttk.Button(
