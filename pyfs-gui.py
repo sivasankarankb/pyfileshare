@@ -777,7 +777,7 @@ class Application:
 
     def __pref_menu_download_dest_select(self):
         dir = tk_filedialog.askdirectory()
-        if dir != '':
+        if type(dir) == str and len(dir) != 0:
             text = self.__pref_download_dest_text.get() #TODO: Improve
             self.__pref_download_dest_text.delete(0, len(text))
             self.__pref_download_dest_text.insert(0, dir)
