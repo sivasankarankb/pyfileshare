@@ -837,11 +837,9 @@ class Application:
         return True
 
     def __start_server(self):
-        print('Server start')
         pyfs_server.get_instance().start()
 
     def __stop_server(self):
-        print('Server end')
         pyfs_server.get_instance().stop()
 
     def __disconnect(self, forquit=False):
