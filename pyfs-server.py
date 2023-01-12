@@ -147,12 +147,44 @@ def read_file_part(sharename, path):
 
     else: return {'status': 'error', 'reason': 'not exist'}
 
-cherrypy.config.update({
-                           'server.socket_host': server_listen_ip,
-                           'server.socket_port': server_listen_port
-})
+class Server:
+    def __init__(self, cherrypy, api, ip='0.0.0.0', port=8080):
+        self.__cherrypy = cherrypy
+        self.__api = api
+        self.__ip = ip
+        self.__port = port
+        self.__started = False
 
-cherrypy.tree.graft(app, '/')
+    def is_started(self): return self.__started
 
-cherrypy.engine.start()
-cherrypy.engine.block()
+    def __set_started(self, started): self.__started = started
+
+    def start(self):
+        if not self.is_started():
+            cherrypy.config.update({
+                'server.socket_host': self.__ip,
+                'server.socket_port': self.__port
+            })
+
+            cherrypy.tree.graft(self.__api, '/')
+            cherrypy.engine.start()
+            self.__set_started(True)
+
+    def stop(self):
+        if self.is_started():
+            cherrypy.engine.exit()
+            self.__set_started(False)
+
+
+server = Server(
+    cherrypy=cherrypy, api=app, ip=server_listen_ip, port=server_listen_port
+)
+
+server.start()
+
+try:
+    while True: input()
+
+except: pass
+
+finally: server.stop()
