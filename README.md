@@ -66,7 +66,7 @@ Do `python3 pyfs_server.py`.
 
 ## Running the client
 
-1. Do `python3 pyfs-gui.py`.
+1. Do `python3 app.py`.
 
 2. Set up the Download directory by going to _Preferences_.
 
