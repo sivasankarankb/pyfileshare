@@ -27,7 +27,7 @@ To try pyfileshare:
 
 ## Setting up file sharing
 Sharing is done by allowing access to a directory on the computer.
-Open the `pyfs-server.py` file. This contains code of the server.
+Open the `pyfs_server.py` file. This contains code of the server.
 Edit the line that says `shares = { ... }`.
 
 __Linux (Unix) sharing examples:__
@@ -62,7 +62,7 @@ Note the __double backslashes__ used inside the paths.
 
 ## Running the server
 
-Do `python3 pyfs-server.py`.
+Do `python3 pyfs_server.py`.
 
 ## Running the client
 

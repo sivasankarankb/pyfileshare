@@ -175,16 +175,16 @@ class Server:
             cherrypy.engine.exit()
             self.__set_started(False)
 
+if __name__ == '__main__':
+    server = Server(
+        cherrypy=cherrypy, api=app, ip=server_listen_ip, port=server_listen_port
+    )
 
-server = Server(
-    cherrypy=cherrypy, api=app, ip=server_listen_ip, port=server_listen_port
-)
+    server.start()
 
-server.start()
+    try:
+        while True: input()
 
-try:
-    while True: input()
+    except: pass
 
-except: pass
-
-finally: server.stop()
+    finally: server.stop()
