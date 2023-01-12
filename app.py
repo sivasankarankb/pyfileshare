@@ -10,6 +10,7 @@ import tkinter.filedialog as tk_filedialog
 from tkinter import ttk
 
 from pyfs_client import PyFSClient
+import pyfs_server
 
 class AboutBox:
     def __init__(self, master):
@@ -835,9 +836,13 @@ class Application:
         prefs.close()
         return True
 
-    def __start_server(self): pass
+    def __start_server(self):
+        print('Server start')
+        pyfs_server.get_instance().start()
 
-    def __stop_server(self): pass
+    def __stop_server(self):
+        print('Server end')
+        pyfs_server.get_instance().stop()
 
     def __disconnect(self, forquit=False):
         if self.__client != None:

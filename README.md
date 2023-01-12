@@ -62,7 +62,8 @@ Note the __double backslashes__ used inside the paths.
 
 ## Running the server
 
-Do `python3 pyfs_server.py`.
+Do `python3 pyfs_server.py` to run the server app on its own. You can also
+control the server from the _Server_ menu in the client.
 
 ## Running the client
 
