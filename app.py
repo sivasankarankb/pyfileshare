@@ -335,6 +335,20 @@ class Application:
         self.__menubar.add(
             tk.CASCADE, label='Edit', menu=edit_menu
         )
+
+        server_menu = tk.Menu(self.__tk, tearoff=False)
+
+        server_menu.add(
+            tk.COMMAND, label='Start Server', command=self.__start_server
+        )
+
+        server_menu.add(
+            tk.COMMAND, label='Stop Server', command=self.__stop_server
+        )
+
+        self.__menubar.add(
+            tk.CASCADE, label='Server', menu=server_menu
+        )
         
         help_menu = tk.Menu(self.__tk, tearoff=False)
         
@@ -820,6 +834,10 @@ class Application:
 
         prefs.close()
         return True
+
+    def __start_server(self): pass
+
+    def __stop_server(self): pass
 
     def __disconnect(self, forquit=False):
         if self.__client != None:
