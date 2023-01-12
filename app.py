@@ -337,18 +337,19 @@ class Application:
             tk.CASCADE, label='Edit', menu=edit_menu
         )
 
-        server_menu = tk.Menu(self.__tk, tearoff=False)
+        self.__server_menu = tk.Menu(self.__tk, tearoff=False)
 
-        server_menu.add(
+        self.__server_menu.add(
             tk.COMMAND, label='Start', command=self.__start_server
         )
 
-        server_menu.add(
-            tk.COMMAND, label='Stop', command=self.__stop_server
+        self.__server_menu.add(
+            tk.COMMAND, label='Stop', command=self.__stop_server,
+            state=tk.DISABLED
         )
 
         self.__menubar.add(
-            tk.CASCADE, label='Server', menu=server_menu
+            tk.CASCADE, label='Server', menu=self.__server_menu
         )
         
         help_menu = tk.Menu(self.__tk, tearoff=False)
@@ -836,11 +837,21 @@ class Application:
         prefs.close()
         return True
 
+    def __set_server_start_state(self, state):
+        if state == 'on':
+            self.__server_menu.entryconfigure('Start', state=tk.DISABLED)
+            self.__server_menu.entryconfigure('Stop', state=tk.NORMAL)
+        elif state == 'off':
+            self.__server_menu.entryconfigure('Start', state=tk.NORMAL)
+            self.__server_menu.entryconfigure('Stop', state=tk.DISABLED)
+
     def __start_server(self):
         pyfs_server.get_instance().start()
+        self.__set_server_start_state('on')
 
     def __stop_server(self):
         pyfs_server.get_instance().stop()
+        self.__set_server_start_state('off')
 
     def __disconnect(self, forquit=False):
         if self.__client != None:
