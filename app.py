@@ -366,6 +366,8 @@ class Application:
 
         self.__prefs_load()
 
+        self.__server = pyfs_server.get_instance()
+
     def __set_title(self, title=''):
         if title != '': title = 'pyfileshare - ' + title
         else: title = 'pyfileshare'
@@ -846,11 +848,11 @@ class Application:
             self.__server_menu.entryconfigure('Stop', state=tk.DISABLED)
 
     def __start_server(self):
-        pyfs_server.get_instance().start()
+        self.__server.start()
         self.__set_server_start_state('on')
 
     def __stop_server(self):
-        pyfs_server.get_instance().stop()
+        self.__server.stop()
         self.__set_server_start_state('off')
 
     def __disconnect(self, forquit=False):
