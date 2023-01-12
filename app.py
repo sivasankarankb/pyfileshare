@@ -340,11 +340,11 @@ class Application:
         server_menu = tk.Menu(self.__tk, tearoff=False)
 
         server_menu.add(
-            tk.COMMAND, label='Start Server', command=self.__start_server
+            tk.COMMAND, label='Start', command=self.__start_server
         )
 
         server_menu.add(
-            tk.COMMAND, label='Stop Server', command=self.__stop_server
+            tk.COMMAND, label='Stop', command=self.__stop_server
         )
 
         self.__menubar.add(
