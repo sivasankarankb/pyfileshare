@@ -175,11 +175,21 @@ class Server:
             cherrypy.engine.exit()
             self.__set_started(False)
 
-if __name__ == '__main__':
-    server = Server(
-        cherrypy=cherrypy, api=app, ip=server_listen_ip, port=server_listen_port
-    )
+server_instance = None
 
+def get_instance():
+    global server_instance
+
+    if server_instance == None:
+        server_instance = Server(
+            cherrypy=cherrypy, api=app,
+            ip=server_listen_ip, port=server_listen_port
+        )
+
+    return server_instance
+
+if __name__ == '__main__':
+    server = get_instance()
     server.start()
 
     try:
