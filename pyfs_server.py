@@ -186,12 +186,14 @@ def get_instance():
 
     if server_instance == None:
         server_instance = Server(cherrypy=cherrypy, api=app)
+        server_instance.listen_to(
+            ip=server_listen_ip, port=server_listen_port
+        )
 
     return server_instance
 
 if __name__ == '__main__':
     server = get_instance()
-    server.listen_to(ip=server_listen_ip, port=server_listen_port)
     server.start()
 
     try:
