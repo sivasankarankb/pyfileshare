@@ -165,18 +165,18 @@ class Server:
 
     def start(self):
         if not self.is_started() and self.__listen_setup:
-            cherrypy.config.update({
+            self.__cherrypy.config.update({
                 'server.socket_host': self.__ip,
                 'server.socket_port': self.__port
             })
 
-            cherrypy.tree.graft(self.__api, '/')
-            cherrypy.engine.start()
+            self.__cherrypy.tree.graft(self.__api, '/')
+            self.__cherrypy.engine.start()
             self.__set_started(True)
 
     def stop(self):
         if self.is_started():
-            cherrypy.engine.exit()
+            self.__cherrypy.engine.exit()
             self.__set_started(False)
 
 server_instance = None
