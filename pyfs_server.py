@@ -163,6 +163,9 @@ class Server:
         self.__port = port
         self.__listen_setup = True
 
+    def set_console_logging(self, enabled):
+        self.__cherrypy.config.update({'log.screen': enabled})
+
     def start(self):
         if not self.is_started() and self.__listen_setup:
             self.__cherrypy.config.update({
