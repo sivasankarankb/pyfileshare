@@ -158,7 +158,7 @@ class Server:
 
     def __set_started(self, started): self.__started = started
 
-    def listen_to(ip, port):
+    def listen_to(self, ip, port):
         self.__ip = ip
         self.__port = port
         self.__listen_setup = True
