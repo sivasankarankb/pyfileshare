@@ -189,6 +189,7 @@ def get_instance():
 
     if server_instance == None:
         server_instance = Server(cherrypy=cherrypy, api=app)
+        server_instance.set_console_logging(False)
         server_instance.listen_to(
             ip=server_listen_ip, port=server_listen_port
         )
