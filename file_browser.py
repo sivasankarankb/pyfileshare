@@ -5,23 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 
 import tkutils
-
-def shortensize(size):
-    unit = 'B'
-
-    if size >= 1024:
-        size /= 1024
-        unit = 'KB'
-
-    if size >= 1024:
-        size /= 1024
-        unit = 'MB'
-
-    if size >= 1024:
-        size /= 1024
-        unit = 'GB'
-
-    return str('%.2f' % round(size, 2)) + ' ' + unit
+import format_size
 
 class FileBrowser:
     def __init__(self):
@@ -246,7 +230,7 @@ class FileBrowser:
                 if fileinfo != None and fileinfo['status'] == 'ok':
                     parsedinfo = {}
                     size = fileinfo['info']['size']
-                    parsedinfo['size'] = shortensize(size)
+                    parsedinfo['size'] = format_size.shortensize(size)
 
                     moment = fileinfo['info']['created']
                     moment = time.strptime(moment, infmt)
