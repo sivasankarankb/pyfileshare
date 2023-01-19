@@ -4,24 +4,7 @@ import time
 import tkinter as tk
 from tkinter import ttk
 
-def create_treeview(master, columns):
-    treeview = ttk.Treeview(master=master)
-    treeview['selectmode'] = 'browse'
-    treeview['columns'] = columns[1:]
-    treeview.heading('#0', text=columns[0])
-
-    for column in columns[1:]:
-        treeview.heading(column, text=column)
-
-    return treeview
-
-def disable_widget(widget): widget.state(('disabled',))
-
-def enable_widget(widget): widget.state(('!disabled',))
-
-def load_icon(path):
-    try: return tk.PhotoImage(file=path)
-    except: return None
+import tkutils
 
 def shortensize(size):
     unit = 'B'
@@ -52,15 +35,15 @@ class FileBrowser:
         self.__connect_success_listener = None
         self.__file_downloader = None
 
-        self.__icon_go = load_icon('icons/go.png')
-        self.__icon_disconnect = load_icon('icons/disconnect.png')
+        self.__icon_go = tkutils.load_icon('icons/go.png')
+        self.__icon_disconnect = tkutils.load_icon('icons/disconnect.png')
 
-        self.__icon_back = load_icon('icons/backward.png')
-        self.__icon_refresh = load_icon('icons/refresh.png')
-        self.__icon_forward = load_icon('icons/forward.png')
+        self.__icon_back = tkutils.load_icon('icons/backward.png')
+        self.__icon_refresh = tkutils.load_icon('icons/refresh.png')
+        self.__icon_forward = tkutils.load_icon('icons/forward.png')
 
-        self.__icon_file = load_icon('icons/file.png')
-        self.__icon_folder = load_icon('icons/folder.png')
+        self.__icon_file = tkutils.load_icon('icons/file.png')
+        self.__icon_folder = tkutils.load_icon('icons/folder.png')
 
         self.__filesframe = ttk.Frame(master=None)
 
@@ -72,7 +55,7 @@ class FileBrowser:
         self.__filelist_back_button.grid(
             row=0, column=0, sticky=tk.E, padx=(0, 8)
         )
-        disable_widget(self.__filelist_back_button)
+        tkutils.disable_widget(self.__filelist_back_button)
 
         self.__filelist_refresh_button = ttk.Button(
             master=self.__filesframe, text='Refresh',
@@ -80,7 +63,7 @@ class FileBrowser:
         )
 
         self.__filelist_refresh_button.grid(row=0, column=1, padx=(0, 8))
-        disable_widget(self.__filelist_refresh_button)
+        tkutils.disable_widget(self.__filelist_refresh_button)
 
         self.__filelist_forward_button = ttk.Button(
             master=self.__filesframe, text='Forward',
@@ -88,7 +71,7 @@ class FileBrowser:
         )
 
         self.__filelist_forward_button.grid(row=0, column=2, sticky=tk.W)
-        disable_widget(self.__filelist_forward_button)
+        tkutils.disable_widget(self.__filelist_forward_button)
 
         self.__address_bar_value = tk.StringVar()
         self.__address_bar_value.set("http://host:8080")
@@ -110,7 +93,7 @@ class FileBrowser:
 
         self.__filelist_address_bar.bind('<Return>', self.__address_bar_activate)
 
-        self.__filelist = create_treeview(
+        self.__filelist = tkutils.create_treeview(
             self.__filesframe, ('Name', 'Size', 'Created', 'Modified')
         )
 
@@ -163,24 +146,24 @@ class FileBrowser:
 
     def __display_listing(self):
         if len(self.__listings) <= 1:
-            disable_widget(self.__filelist_back_button)
+            tkutils.disable_widget(self.__filelist_back_button)
         else:
-            enable_widget(self.__filelist_back_button)
+            tkutils.enable_widget(self.__filelist_back_button)
 
         for child in self.__filelist.get_children():
             self.__filelist.delete(child)
 
         if len(self.__listings_forward) > 0:
-            enable_widget(self.__filelist_forward_button)
+            tkutils.enable_widget(self.__filelist_forward_button)
 
-        else: disable_widget(self.__filelist_forward_button)
+        else: tkutils.disable_widget(self.__filelist_forward_button)
 
         if len(self.__listings) == 0:
-            disable_widget(self.__filelist_refresh_button)
+            tkutils.disable_widget(self.__filelist_refresh_button)
             self.__set_title()
             return
 
-        enable_widget(self.__filelist_refresh_button)
+        tkutils.enable_widget(self.__filelist_refresh_button)
 
         listing = self.__listings[-1]
         self.__set_title(self.__server_addr + listing['info']['path'])
@@ -216,13 +199,13 @@ class FileBrowser:
             self.__filelist_go_button['text'] = 'Disconnect'
             self.__filelist_go_button['command'] = self.disconnect
             self.__filelist_go_button['image'] = self.__icon_disconnect
-            disable_widget(self.__filelist_address_bar)
+            tkutils.disable_widget(self.__filelist_address_bar)
 
         elif state == 'go':
             self.__filelist_go_button['text'] = 'Go'
             self.__filelist_go_button['command'] = self.__filelist_go
             self.__filelist_go_button['image'] = self.__icon_go
-            enable_widget(self.__filelist_address_bar)
+            tkutils.enable_widget(self.__filelist_address_bar)
 
     def __address_bar_activate(self, event): self.__filelist_go()
 
